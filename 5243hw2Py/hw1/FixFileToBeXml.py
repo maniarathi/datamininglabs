@@ -95,5 +95,6 @@ def SgmToXml(SgmPath, XmlPath):
                     # Write the XML to a file
                     # Since it is an illegal XML (multiple children) - I make it legal, by adding a root node.
                     xmlFixer.seek(0) 
-                    xmlFixer.write(FirstSection + u'<reports>\n'+SecondSection + u'\n</reports>') 
+                    #xmlFixer.write(FirstSection + u'<reports>\n'+SecondSection + u'\n</reports>') 
+                    xmlFixer.write(u'<reports>\n'+SecondSection + u'\n</reports>')
                     print 'Wrote ' + dirpath + filename+'.xml'
