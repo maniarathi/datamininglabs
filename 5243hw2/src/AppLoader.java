@@ -50,8 +50,12 @@ public class AppLoader
 				  			// For each article - extract the topics, locations, and text
 				  			int id = Integer.parseInt(eArticle.getAttribute("NEWID"));
 				  			
-							NodeList nTopics = ((Element)eArticle.getElementsByTagName("TOPICS").item(0)).getElementsByTagName("D");
-							NodeList nLocations = ((Element)eArticle.getElementsByTagName("PLACES").item(0)).getElementsByTagName("D");
+							NodeList nTopics = null;
+							if (eArticle.getElementsByTagName("TOPICS").getLength()> 0)
+								nTopics = ((Element)eArticle.getElementsByTagName("TOPICS").item(0)).getElementsByTagName("D");
+							NodeList nLocations = null;
+							if (eArticle.getElementsByTagName("PLACES").getLength()> 0)
+								nLocations = ((Element)eArticle.getElementsByTagName("PLACES").item(0)).getElementsByTagName("D");
 							
 							// Get Text and subjects
 							Node nText = eArticle.getElementsByTagName("TEXT").item(0);
@@ -66,11 +70,16 @@ public class AppLoader
 							String[] DateLine = XmlReader.getElementContent(nDateLine);
 							String[] Body = XmlReader.getElementContent(nBody);
 							
+							WordCountVector.AddDocumentToTopicVector(id,Topics, Title, Body);
+							
 				  			System.out.println("Processed Document " + id);
 				    	  }
 				      }
 			      }
 			  }
 		  }
+		  
+		  System.out.println("finished creating vector.\nThere are " + WordCountVector.Words.size() + " Words.\n"+
+				  			"There are " + WordCountVector.Document.size() + " Documents.");
 	}
 }
