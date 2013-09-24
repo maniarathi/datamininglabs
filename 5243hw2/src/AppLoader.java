@@ -8,21 +8,31 @@ import org.w3c.dom.NodeList;
 
 public class AppLoader 
 {
+		
 	static public void main(String[] params)
 	{
+		// Load the xmls and the dictionary
 		String XmlsPath;
+		WordCountVector.LoadDictionary();
 		
 		if (params.length == 0)
 			XmlsPath = "../5243hw2Py/hw1/xmls/";
 		else
 			XmlsPath = params[0];
 		
+		// Build the vector
 		ReadXmlAndBuildVector(XmlsPath);
+		
+		// Write the vector to disk
+		System.out.println("Finished building vector, starting to write file.");
+		WordCountVector.WriteToFile("output/results.csv");
+		System.out.println("Finished writing file.");
 	}
 	
+	// Read all the xmls in a directory - and build the vectors
 	static public void ReadXmlAndBuildVector(String XmlsPath)
 	{
-		   
+		   // Get all XML files
 		  File dir = new File(XmlsPath);
 		  File [] files = dir.listFiles(new FilenameFilter() {
 		      @Override
@@ -31,16 +41,18 @@ public class AppLoader
 		      }
 		  });
 
-		  // Getting the articles...
+		  // For each file, parse the xml
 		  if (files != null)
 		  {
 			  for (File xmlfile : files) 
 			  {
+				  // Get each article (within the large XML
 			      Document doc = XmlReader.ReturnXml(xmlfile.getPath());
 			      Node[] articles = XmlReader.getElements(doc, "REUTERS");
 			      
 			      if (articles != null)
 			      {
+			    	  // Get the properties of each XML - and add it to the vector
 				      for (Node article : articles)
 				      {
 				    	  if (article.getNodeType() == Node.ELEMENT_NODE) 
@@ -79,7 +91,9 @@ public class AppLoader
 			  }
 		  }
 		  
-		  System.out.println("finished creating vector.\nThere are " + WordCountVector.Words.size() + " Words.\n"+
+		  // Outputs the results
+		  System.out.println("finished creating vector.\nThere are " + WordCountVector.Words.size() + " Words, and " + 
+				  			WordCountVector.Topics.size() + " Topics.\n"+
 				  			"There are " + WordCountVector.Document.size() + " Documents.");
 	}
 }

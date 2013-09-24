@@ -6,7 +6,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
 
-
 public class XmlReader 
 {
 	static public Document ReturnXml(String FilePath)
