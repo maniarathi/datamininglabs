@@ -332,12 +332,12 @@ public class WordCountVector
 			bw.write("\n");
 			
 			// Write Topics
-			for (int i=0; i < ReverseWords.size();++i)
+			for (int i=0; i < ReverseTopics.size();++i)
 			{
 				if (i==0)
-					LineToPut = "DocumentId," + ReverseWords.get(i);
+					LineToPut = "DocumentId," + ReverseTopics.get(i);
 				else
-					LineToPut += "," + ReverseWords.get(i);
+					LineToPut += "," + ReverseTopics.get(i);
 			}
 			bw.write(LineToPut + "\n\n");
 			
