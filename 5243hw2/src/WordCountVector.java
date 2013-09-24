@@ -16,6 +16,7 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 public class WordCountVector 
 {
+	static double SigmaMultiplier = 0.1; // This is a sigma that matches this data
 	static HashSet<String> EnglishDictionary = new HashSet<String>(); // English dictionary 
 	static HashMap<String,Integer> Topics = new HashMap<String,Integer>(); // Holds a list of optional topics
 	static HashMap<String,Integer> Words = new HashMap<String,Integer>();  // Holds a list of words that being used
@@ -369,5 +370,100 @@ public class WordCountVector
 		bw = null;
 		fis = null;
 		
+	}
+
+	static public void DecreaseVectorSize()
+	{
+		// Get prepared  - prepare the words to be used:
+		HashMap<Integer,String> ReverseWords = new HashMap<>();
+		for(String word : Words.keySet())
+		{
+			ReverseWords.put(Words.get(word), word);
+		}
+		
+		// Find Mean and variance of words
+		double sum = 0;
+		double varsum = 0;
+		double variance = 0;
+		double count = 0;
+		
+		for (int i=0; i < Words.size(); ++i)
+		{
+			varsum = 0;
+			for (int j=0;j < Document.size(); ++j)
+			{
+				if (TopicsTrainingMatrix[j] != null && TopicsTrainingMatrix[j].length>i)
+				{
+					sum += TopicsTrainingMatrix[j][i];
+					varsum += TopicsTrainingMatrix[j][i];
+				}
+			}
+			variance += Math.pow(varsum, 2);
+			++count;
+		}
+		double mean = sum / count;
+		variance = variance / count;
+		variance = Math.sqrt(variance - Math.pow(mean,2));
+		
+		System.out.println("The mean is "+ mean + " and the variance is " + variance);
+		
+		// Find words that are between -2sigma to sigma
+		HashSet<String> WordsToUse = new HashSet<String>();
+		for (int i=0; i < Words.size(); ++i)
+		{
+			sum = 0;
+			for (int j=0;j < Document.size(); ++j)
+			{
+				if (TopicsTrainingMatrix[j] != null && TopicsTrainingMatrix[j].length>i)
+				{
+					sum += TopicsTrainingMatrix[j][i];
+					varsum += TopicsTrainingMatrix[j][i];
+				}
+			}
+			
+			if (sum >= mean - (SigmaMultiplier*variance) && sum <= mean + (SigmaMultiplier*variance))
+			{
+				WordsToUse.add(ReverseWords.get(i));
+			}
+		}
+		System.out.println("There are "+ WordsToUse.size() + " words left after cutting by statistical properties.");
+		
+		// Fix the matrices to keep only these words.
+		 int[][] TopicsTrainingMatrixToSwap = new int[Document.size()][];
+		 HashMap<String,Integer> WordsToSwap = new HashMap<String,Integer>();
+		 
+		 for (int i=0; i<Document.size();++i)
+		 {
+			 for (int j=0; j< Words.size() && TopicsTrainingMatrix[i] != null && j<TopicsTrainingMatrix[i].length;++j)
+			 {
+				 String CurrWord = ReverseWords.get(j);
+				 if (WordsToUse.contains(CurrWord))
+				 {
+					 // Get the word key in the new array
+					 int WordKey;
+					 if (WordsToSwap.containsKey(CurrWord))
+					 {
+						 WordKey = WordsToSwap.get(CurrWord);
+					 }
+					 else
+					 {
+						 WordKey = WordsToSwap.size();
+						 WordsToSwap.put(CurrWord,WordKey);
+					 }
+					 
+					 if (TopicsTrainingMatrixToSwap[i] == null)
+					 {
+						 TopicsTrainingMatrixToSwap[i] = new int[WordsToUse.size()];
+					 }
+					 
+					 TopicsTrainingMatrixToSwap[i][WordKey] = TopicsTrainingMatrix[i][j];
+				 }
+			 }
+		 }
+		 
+		 // Swap the dictionaries
+		 TopicsTrainingMatrix = TopicsTrainingMatrixToSwap;
+		 Words = WordsToSwap;
+		 System.out.println("After reducing - there are " + Words.size() + " words represented here.");
 	}
 }

@@ -22,6 +22,7 @@ public class AppLoader
 		
 		// Build the vector
 		ReadXmlAndBuildVector(XmlsPath);
+		WordCountVector.DecreaseVectorSize();
 		
 		// Write the vector to disk
 		System.out.println("Finished building vector, starting to write file.");
