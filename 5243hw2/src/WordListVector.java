@@ -14,7 +14,6 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 public class WordListVector 
 {
-	static int TitleWeight = 10; // The additional weight a topic word has.
 	static HashMap<Integer, HashSet<String>> WordListVector = new HashMap<Integer, HashSet<String>>(); // Holds for each article its distinct words
 	static private PorterStemmer stemmer = new PorterStemmer(); // A LUCENE stemmer for stemming
 	

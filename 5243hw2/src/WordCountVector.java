@@ -20,7 +20,7 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 public class WordCountVector 
 {
-	static double SigmaMultiplier = 0.1; // This is a sigma that matches this data
+	static double SigmaMultiplier = 0.14; // This is a sigma that matches this data
 	static HashSet<String> EnglishDictionary = new HashSet<String>(); // English dictionary 
 	static HashMap<String,Integer> Topics = new HashMap<String,Integer>(); // Holds a list of optional topics
 	static HashMap<String,Integer> Words = new HashMap<String,Integer>();  // Holds a list of words that being used
