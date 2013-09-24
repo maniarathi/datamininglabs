@@ -1,3 +1,8 @@
+/// Roee Ebenstein
+/// 2013.09.23
+////////////////////////////
+// This is an xml reader, it will do the processing of XML for the rest of the application,
+// so no one needs to know almost anything about the xml (though they get an xml or a node).
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
@@ -8,6 +13,7 @@ import java.io.File;
 
 public class XmlReader 
 {
+	// Opens an xml file, loads it, and returns it (very straight forward)
 	static public Document ReturnXml(String FilePath)
 	{
 		Document retVal = null;
@@ -29,6 +35,7 @@ public class XmlReader
 		return retVal;
 	}
 	
+	// This will return a string out of a node, by a tag name
 	static public String[] getElementContent(Document doc,String TagNameToGet)
 	{
 		String[] retVal;
@@ -39,6 +46,7 @@ public class XmlReader
 		return retVal;
 	}
 	
+	// Returns all the node content (and subnodes)
 	static public String[] getElementContent(NodeList nd)
 	{
 		String[] retVal;
@@ -59,6 +67,7 @@ public class XmlReader
 		return retVal;
 	}
 	
+	// Returns a set of nodes from a docment, by a tagname
 	static public Node[] getElements(Document doc, String TagNameToGet)
 	{
 		Node[] retVal;

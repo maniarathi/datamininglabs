@@ -1,4 +1,8 @@
-
+/// Roee Ebenstein
+/// 2013.09.23
+////////////////////////////
+// This is a word count vector
+// It also implements word reduction (by statistical measures, dictionary, and stop words)
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -318,7 +322,7 @@ public class WordCountVector
 			{
 				for(int j=0; TopicsTrainingMatrix[i] != null && j < TopicsTrainingMatrix[i].length; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
+					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 					else LineToPut += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 				}
 				int StartVal = 0;
@@ -347,7 +351,7 @@ public class WordCountVector
 			{
 				for(int j=0; TopicsClassificationMatrix[i] != null && j < TopicsClassificationMatrix[i].length; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(TopicsClassificationMatrix[i][j]);
+					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsClassificationMatrix[i][j]);
 					else LineToPut += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
 				}
 				int StartVal = 0;
@@ -376,9 +380,16 @@ public class WordCountVector
 	{
 		// Get prepared  - prepare the words to be used:
 		HashMap<Integer,String> ReverseWords = new HashMap<>();
+		HashMap<Integer,Integer> ReverseDocumentIds = new HashMap<>();
+		int[][] TopicsClassToSwap = null;
+		
 		for(String word : Words.keySet())
 		{
 			ReverseWords.put(Words.get(word), word);
+		}
+		for(int docId : Document.keySet())
+		{
+			ReverseDocumentIds.put(Document.get(docId), docId);
 		}
 		
 		// Find Mean and variance of words
@@ -431,9 +442,13 @@ public class WordCountVector
 		// Fix the matrices to keep only these words.
 		 int[][] TopicsTrainingMatrixToSwap = new int[Document.size()][];
 		 HashMap<String,Integer> WordsToSwap = new HashMap<String,Integer>();
+		 HashMap<Integer,Integer> DocumentToSwap = new HashMap<Integer,Integer>();
+		 HashMap<Integer,Integer> DocumentToSwapReverse = new HashMap<Integer,Integer>();
+		 int NumOfRowsToGoDown = 0;
 		 
 		 for (int i=0; i<Document.size();++i)
 		 {
+			 int NumOfRowsWritten = 0;
 			 for (int j=0; j< Words.size() && TopicsTrainingMatrix[i] != null && j<TopicsTrainingMatrix[i].length;++j)
 			 {
 				 String CurrWord = ReverseWords.get(j);
@@ -451,19 +466,43 @@ public class WordCountVector
 						 WordsToSwap.put(CurrWord,WordKey);
 					 }
 					 
-					 if (TopicsTrainingMatrixToSwap[i] == null)
+					 if (TopicsTrainingMatrixToSwap[i-NumOfRowsToGoDown] == null)
 					 {
-						 TopicsTrainingMatrixToSwap[i] = new int[WordsToUse.size()];
+						 TopicsTrainingMatrixToSwap[i-NumOfRowsToGoDown] = new int[WordsToUse.size()];
 					 }
 					 
-					 TopicsTrainingMatrixToSwap[i][WordKey] = TopicsTrainingMatrix[i][j];
+					 TopicsTrainingMatrixToSwap[i-NumOfRowsToGoDown][WordKey] = TopicsTrainingMatrix[i][j];
+					 if (TopicsTrainingMatrix[i][j] > 0) ++NumOfRowsWritten;
 				 }
+			 }
+			 if (NumOfRowsWritten == 0)
+			 {
+				 TopicsTrainingMatrixToSwap[i - NumOfRowsToGoDown] = null;
+				 ++NumOfRowsToGoDown;
+			 }
+			 else
+			 {
+				 DocumentToSwap.put(i-NumOfRowsToGoDown, ReverseDocumentIds.get(i));
+				 DocumentToSwapReverse.put(ReverseDocumentIds.get(i), i-NumOfRowsToGoDown);
+			 }
+		 }
+		 
+		 // Build the new classification matrix
+		 TopicsClassToSwap = new int[DocumentToSwap.size()][];
+		 for (int i=0; i< DocumentToSwap.size();++i)
+		 {
+			 if (DocumentToSwapReverse.containsKey(Document.get(i)))
+			 {
+				 int TargetRow = DocumentToSwapReverse.get(Document.get(i));
+				 TopicsClassToSwap[TargetRow] = TopicsClassificationMatrix[i];
 			 }
 		 }
 		 
 		 // Swap the dictionaries
 		 TopicsTrainingMatrix = TopicsTrainingMatrixToSwap;
+		 TopicsClassificationMatrix = TopicsClassToSwap;
 		 Words = WordsToSwap;
+		 Document = DocumentToSwap;
 		 System.out.println("After reducing - there are " + Words.size() + " words represented here.");
 	}
 }
