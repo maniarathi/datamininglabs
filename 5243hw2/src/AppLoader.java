@@ -34,15 +34,15 @@ public class AppLoader
 		
 		// Write the vector to disk
 		System.out.println("Finished building vector, starting to write WordCountVector file and TopicsVector file.");
-		WordCountVector.WriteToFile("../output/WordCount.csv", "../output/TopicsVector.csv");
+		WordCountVector.WriteToFile("output/WordCount.csv", "../output/TopicsVector.csv");
 		System.out.println("Finished building vector, starting to write WordListVector file.");
-		WordListVector.WriteToFile("../output/WordList.csv");
+		WordListVector.WriteToFile("output/WordList.csv");
 		System.out.println("Finished writing files.");
 		
 		// Start KNN Classification
-		KNNPrediction.GetDataSource("../output/WordCount.csv");
-		KNNPrediction.TrainKNNModel();
-		KNNPrediction.TestKNNModel();
+		//KNNPrediction.GetDataSource("output/WordCount.csv");
+		//KNNPrediction.TrainKNNModel();
+		//KNNPrediction.TestKNNModel();
 		
 		// Start Naive Bayes Classificaiton
 	}

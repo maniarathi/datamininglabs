@@ -20,7 +20,7 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 public class WordCountVector 
 {
-	static double SigmaMultiplier = 0.14; // This is a sigma that matches this data
+	static double SigmaMultiplier = 0.08; // This is a sigma that matches this data
 	static HashSet<String> EnglishDictionary = new HashSet<String>(); // English dictionary 
 	static HashMap<String,Integer> Topics = new HashMap<String,Integer>(); // Holds a list of optional topics
 	static HashMap<String,Integer> Words = new HashMap<String,Integer>();  // Holds a list of words that being used
@@ -33,7 +33,23 @@ public class WordCountVector
 	static public void AddDocumentToTopicVector(int DocId, String[] DocumentTopics, String[] Title, String[] Body)
 	{
 		// If there's nothing to add - exit
-		if (DocumentTopics == null || (Title == null && Body == null)) return;
+		if (DocumentTopics == null || DocumentTopics.length == 0 || ((Title == null || Title.length == 0) && (Body == null || Body.length == 0))) return;
+		boolean AllTextEmpty = true;
+		for (String s : DocumentTopics)
+		{
+			if (s != null && s.trim() != "") AllTextEmpty = false;
+		}
+		if (AllTextEmpty) return;
+		AllTextEmpty = true;
+		if (Title != null) for (String s : Title)
+		{
+			if (s != null && s.trim() != "") AllTextEmpty = false;
+		}
+		if (Body != null) for (String s : Body)
+		{
+			if (s != null && s.trim() != "") AllTextEmpty = false;
+		}
+		if (AllTextEmpty) return;
 		
 		// Assign the document a number (the line it will be in in the matrices)
 		int DocLine = 0;
@@ -80,8 +96,15 @@ public class WordCountVector
 			}
 		}
 		
-		// Add the topics to the appropriate matrix
-		AddTopicsClassification(DocLine, DocumentTopics);
+		if (TopicsTrainingMatrix[DocLine] == null)
+		{
+			Document.remove(DocId);
+		}
+		else
+		{
+			// Add the topics to the appropriate matrix
+			AddTopicsClassification(DocLine, DocumentTopics);
+		}
 	}
 	
 	
@@ -95,11 +118,11 @@ public class WordCountVector
 		if (word.length() <= 2 || word.length() > 15) return;
 		
 		// Stem the word
-		String OrigWord = word;
+		String OrigWord = word.toLowerCase();
 		stemmer.setCurrent(word);
 		if (stemmer.stem())
 		{
-			word =stemmer.getCurrent();
+			word =stemmer.getCurrent().toLowerCase();
 			
 			// If the word is not a known English word - drop it.
 			if (EnglishDictionary!= null && (!EnglishDictionary.contains(word) && !EnglishDictionary.contains(OrigWord))) return;
@@ -249,17 +272,17 @@ public class WordCountVector
 		try
 		{
 			// Get the Linux dictionary file
-			fis = new FileInputStream("/usr/share/dict/words");
+			fis = new FileInputStream("words");
 			br = new BufferedReader(new InputStreamReader(fis));
 			
 			// for each word, add it as is to the dictionary, and add its stemming - if it wasn't added earlier.
-			while ((word = br.readLine()) != null) 
+			while ((word = br.readLine().toLowerCase()) != null) 
 			{
 				if (!EnglishDictionary.contains(word)) EnglishDictionary.add(word);
 				stemmer.setCurrent(word);
 				if (stemmer.stem())
 				{
-					word =stemmer.getCurrent();
+					word =stemmer.getCurrent().toLowerCase();
 					if (!EnglishDictionary.contains(word)) EnglishDictionary.add(word);
 				}
 			}
@@ -293,24 +316,24 @@ public class WordCountVector
 			ReverseDocumentIds.put(Document.get(docId), docId);
 		}
 		int NumOfWords = Words.size();
-		int NumOfTopics = Topics.size();
+		//int NumOfTopics = Topics.size();
 		
 		
 		// Build a file using the following format : columns, Matrix (first column is documentId), and afterwards same format for topics
 		OutputStream 	fisw;
-		OutputStream 	fist;
+		//OutputStream 	fist;
 		BufferedWriter 	bww;
-		BufferedWriter 	bwt;
+		//BufferedWriter 	bwt;
 
 		try
 		{
 			fisw	= new FileOutputStream(FileNameWords);
-			fist	= new FileOutputStream(FileNameTopics);
+			//fist	= new FileOutputStream(FileNameTopics);
 			bww		= new BufferedWriter(new OutputStreamWriter(fisw));
-			bwt		= new BufferedWriter(new OutputStreamWriter(fist));
+			//bwt		= new BufferedWriter(new OutputStreamWriter(fist));
 			
 			String LineToPutInWordsFile = "";
-			String LineToPutInTopicsFile = "";
+			//String LineToPutInTopicsFile = "";
 			
 			// Write words across the top of the CSV file
 			for (int i=0; i < ReverseWords.size();++i)
@@ -321,14 +344,15 @@ public class WordCountVector
 					LineToPutInWordsFile += "," + ReverseWords.get(i);
 			}
 			// Write topics across the top of the CSV file
-			for (int i=0; i < ReverseTopics.size();++i)
+			/*for (int i=0; i < ReverseTopics.size();++i)
 			{
 				if (i==0)
 					LineToPutInTopicsFile = "DocumentId," + ReverseWords.get(i);
 				LineToPutInTopicsFile += "," + ReverseTopics.get(i);
 			}
+			LineToPutInWordsFile += ",Topics";*/
 			bww.write(LineToPutInWordsFile + "\n\n");
-			bwt.write(LineToPutInTopicsFile + "\n\n");
+			//bwt.write(LineToPutInTopicsFile + "\n\n");
 			
 			
 			// Write the words vector, each line first parameter is the document id - afterwards the word count of the matching column
@@ -339,12 +363,6 @@ public class WordCountVector
 					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 					else LineToPutInWordsFile += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 				}
-				for(int j=0; TopicsClassificationMatrix[i] != null && j < TopicsClassificationMatrix[i].length; ++j)
-				{
-					if (j==0) LineToPutInTopicsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsClassificationMatrix[i][j]);
-					LineToPutInTopicsFile += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
-				}
-				
 				int StartVal = 0;
 				if (TopicsTrainingMatrix[i]!= null ) StartVal = TopicsTrainingMatrix[i].length;
 				for (int j = StartVal; j < NumOfWords; ++j)
@@ -352,30 +370,31 @@ public class WordCountVector
 					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
 					else LineToPutInWordsFile += "," + String.valueOf(0);
 				}
-				
-				StartVal = 0;
-				if (TopicsClassificationMatrix[i] != null ) StartVal = TopicsClassificationMatrix[i].length;
-				for (int j = StartVal; j < NumOfTopics; ++j)
+				String BasicLine = LineToPutInWordsFile + ",";
+				for(int j=0; TopicsClassificationMatrix[i] != null && j < Topics.size() && TopicsClassificationMatrix[i].length >j; ++j)
 				{
-					if (j==0) LineToPutInTopicsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
-					else LineToPutInTopicsFile += "," + String.valueOf(0);
+					if (TopicsClassificationMatrix[i][j] > 0)
+					{
+						bww.write(BasicLine +  ReverseTopics.get(j) + "\n");
+					}
 				}
-				bww.write(LineToPutInWordsFile+"\n");
-				bwt.write(LineToPutInTopicsFile+"\n");
+				
+				//bww.write(LineToPutInWordsFile+"\n");
+				//bwt.write(LineToPutInTopicsFile+"\n");
 			}
 			bww.write("\n");
-			bwt.write("\n");
+			//bwt.write("\n");
 			bww.close();
-			bwt.close();
+			//bwt.close();
 		}
 		catch(Exception ex) 
 		{
 			System.out.println("Failed to save file. error: " + ex.getMessage());
 		}
 		bww = null;
-		bwt = null;
+		//bwt = null;
 		fisw = null;
-		fist = null;
+		//fist = null;
 		
 	}
 
@@ -485,8 +504,8 @@ public class WordCountVector
 			 }
 			 else
 			 {
-				 DocumentToSwap.put(i-NumOfRowsToGoDown, ReverseDocumentIds.get(i));
-				 DocumentToSwapReverse.put(ReverseDocumentIds.get(i), i-NumOfRowsToGoDown);
+				 DocumentToSwap.put(ReverseDocumentIds.get(i),i-NumOfRowsToGoDown);
+				 DocumentToSwapReverse.put(i-NumOfRowsToGoDown,ReverseDocumentIds.get(i));
 			 }
 		 }
 		 
@@ -494,11 +513,8 @@ public class WordCountVector
 		 TopicsClassToSwap = new int[DocumentToSwap.size()][];
 		 for (int i=0; i< DocumentToSwap.size();++i)
 		 {
-			 if (DocumentToSwapReverse.containsKey(Document.get(i)))
-			 {
-				 int TargetRow = DocumentToSwapReverse.get(Document.get(i));
-				 TopicsClassToSwap[TargetRow] = TopicsClassificationMatrix[i];
-			 }
+			 int TargetRow = Document.get(DocumentToSwapReverse.get(i));
+			 TopicsClassToSwap[i] = TopicsClassificationMatrix[TargetRow];
 		 }
 		 
 		 // Swap the dictionaries

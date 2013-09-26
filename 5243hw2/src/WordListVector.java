@@ -134,14 +134,14 @@ public class WordListVector
 			{
 				for(int j=0; WordCountVector.TopicsClassificationMatrix[i] != null && j < WordCountVector.TopicsClassificationMatrix[i].length; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(WordCountVector.Document.get(i)) + "," + String.valueOf(WordCountVector.TopicsClassificationMatrix[i][j]);
+					if (j==0) LineToPut = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(WordCountVector.TopicsClassificationMatrix[i][j]);
 					else LineToPut += "," + String.valueOf(WordCountVector.TopicsClassificationMatrix[i][j]);
 				}
 				int StartVal = 0;
 				if (WordCountVector.TopicsClassificationMatrix[i] != null ) StartVal = WordCountVector.TopicsClassificationMatrix[i].length;
 				for (int j = StartVal; j < WordCountVector.Topics.size(); ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(WordCountVector.Document.get(i)) + "," + String.valueOf(0);
+					if (j==0) LineToPut = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(0);
 					else LineToPut += "," + String.valueOf(0);
 				}
 				bw.write(LineToPut+"\n");
