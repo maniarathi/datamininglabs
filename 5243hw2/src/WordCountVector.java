@@ -360,14 +360,14 @@ public class WordCountVector
 			{
 				for(int j=0; TopicsTrainingMatrix[i] != null && j < TopicsTrainingMatrix[i].length; ++j)
 				{
-					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
+					if (j==0) LineToPutInWordsFile = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 					else LineToPutInWordsFile += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 				}
 				int StartVal = 0;
 				if (TopicsTrainingMatrix[i]!= null ) StartVal = TopicsTrainingMatrix[i].length;
 				for (int j = StartVal; j < NumOfWords; ++j)
 				{
-					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
+					if (j==0) LineToPutInWordsFile = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(0);
 					else LineToPutInWordsFile += "," + String.valueOf(0);
 				}
 				String BasicLine = LineToPutInWordsFile + ",";
