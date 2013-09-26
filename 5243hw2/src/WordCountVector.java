@@ -272,7 +272,7 @@ public class WordCountVector
 	}
 	
 	// Build a file for holding the information
-	static public void WriteToFile(String FileName)
+	static public void WriteToFile(String FileNameWords, String FileNameTopics)
 	{
 		// Get ready to save the information - build data structure to help do it faster
 		HashMap<Integer,String> ReverseWords = new HashMap<>();
@@ -297,67 +297,85 @@ public class WordCountVector
 		
 		
 		// Build a file using the following format : columns, Matrix (first column is documentId), and afterwards same format for topics
-		OutputStream fis;
-		BufferedWriter bw;
+		OutputStream 	fisw;
+		OutputStream 	fist;
+		BufferedWriter 	bww;
+		BufferedWriter 	bwt;
 
 		try
 		{
-			fis = new FileOutputStream(FileName);
-			bw = new BufferedWriter(new OutputStreamWriter(fis));
+			fisw	= new FileOutputStream(FileNameWords);
+			fist	= new FileOutputStream(FileNameTopics);
+			bww		= new BufferedWriter(new OutputStreamWriter(fisw));
+			bwt		= new BufferedWriter(new OutputStreamWriter(fist));
 			
-			String LineToPut = "";
+			String LineToPutInWordsFile = "";
+			String LineToPutInTopicsFile = "";
 			
-			// Write words
+			// Write words across the top of the CSV file
 			for (int i=0; i < ReverseWords.size();++i)
 			{
 				if (i==0)
-					LineToPut = "DocumentId," + ReverseWords.get(i);
+					LineToPutInWordsFile = "DocumentId," + ReverseWords.get(i);
 				else
-					LineToPut += "," + ReverseWords.get(i);
+					LineToPutInWordsFile += "," + ReverseWords.get(i);
 			}
-			// Write topics
+			// Write topics across the top of the CSV file
 			for (int i=0; i < ReverseTopics.size();++i)
 			{
-				LineToPut += "," + ReverseTopics.get(i);
+				if (i==0)
+					LineToPutInTopicsFile = "DocumentId," + ReverseWords.get(i);
+				LineToPutInTopicsFile += "," + ReverseTopics.get(i);
 			}
-			bw.write(LineToPut + "\n\n");
+			bww.write(LineToPutInWordsFile + "\n\n");
+			bwt.write(LineToPutInTopicsFile + "\n\n");
+			
 			
 			// Write the words vector, each line first parameter is the document id - afterwards the word count of the matching column
 			for (int i=0; i< Document.size();++i)
 			{
 				for(int j=0; TopicsTrainingMatrix[i] != null && j < TopicsTrainingMatrix[i].length; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
-					else LineToPut += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
+					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
+					else LineToPutInWordsFile += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 				}
 				for(int j=0; TopicsClassificationMatrix[i] != null && j < TopicsClassificationMatrix[i].length; ++j)
 				{
-					LineToPut += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
+					if (j==0) LineToPutInTopicsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsClassificationMatrix[i][j]);
+					LineToPutInTopicsFile += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
 				}
+				
 				int StartVal = 0;
 				if (TopicsTrainingMatrix[i]!= null ) StartVal = TopicsTrainingMatrix[i].length;
 				for (int j = StartVal; j < NumOfWords; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
-					else LineToPut += "," + String.valueOf(0);
+					if (j==0) LineToPutInWordsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
+					else LineToPutInWordsFile += "," + String.valueOf(0);
 				}
+				
+				StartVal = 0;
 				if (TopicsClassificationMatrix[i] != null ) StartVal = TopicsClassificationMatrix[i].length;
 				for (int j = StartVal; j < NumOfTopics; ++j)
 				{
-					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
-					else LineToPut += "," + String.valueOf(0);
+					if (j==0) LineToPutInTopicsFile = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
+					else LineToPutInTopicsFile += "," + String.valueOf(0);
 				}
-				bw.write(LineToPut+"\n");
+				bww.write(LineToPutInWordsFile+"\n");
+				bwt.write(LineToPutInTopicsFile+"\n");
 			}
-			bw.write("\n");			
-			bw.close();
+			bww.write("\n");
+			bwt.write("\n");
+			bww.close();
+			bwt.close();
 		}
 		catch(Exception ex) 
 		{
 			System.out.println("Failed to save file. error: " + ex.getMessage());
 		}
-		bw = null;
-		fis = null;
+		bww = null;
+		bwt = null;
+		fisw = null;
+		fist = null;
 		
 	}
 
