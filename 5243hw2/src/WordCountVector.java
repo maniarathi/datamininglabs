@@ -101,7 +101,7 @@ public class WordCountVector
 		{
 			word =stemmer.getCurrent();
 			
-			// If the word is not a known english word - drop it.
+			// If the word is not a known English word - drop it.
 			if (EnglishDictionary!= null && (!EnglishDictionary.contains(word) && !EnglishDictionary.contains(OrigWord))) return;
 		}
 		else
@@ -248,7 +248,7 @@ public class WordCountVector
 
 		try
 		{
-			// Get the linux dictionary file
+			// Get the Linux dictionary file
 			fis = new FileInputStream("/usr/share/dict/words");
 			br = new BufferedReader(new InputStreamReader(fis));
 			
@@ -265,7 +265,7 @@ public class WordCountVector
 			}
 			br.close();
 		}
-		// In the case of an error reading the dictionary - don't initilize it at all.
+		// In the case of an error reading the dictionary - don't initialize it at all.
 		catch(Exception ex) {EnglishDictionary = null;}
 		br = null;
 		fis = null;
@@ -315,6 +315,11 @@ public class WordCountVector
 				else
 					LineToPut += "," + ReverseWords.get(i);
 			}
+			// Write topics
+			for (int i=0; i < ReverseTopics.size();++i)
+			{
+				LineToPut += "," + ReverseTopics.get(i);
+			}
 			bw.write(LineToPut + "\n\n");
 			
 			// Write the words vector, each line first parameter is the document id - afterwards the word count of the matching column
@@ -325,6 +330,10 @@ public class WordCountVector
 					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 					else LineToPut += "," + String.valueOf(TopicsTrainingMatrix[i][j]);
 				}
+				for(int j=0; TopicsClassificationMatrix[i] != null && j < TopicsClassificationMatrix[i].length; ++j)
+				{
+					LineToPut += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
+				}
 				int StartVal = 0;
 				if (TopicsTrainingMatrix[i]!= null ) StartVal = TopicsTrainingMatrix[i].length;
 				for (int j = StartVal; j < NumOfWords; ++j)
@@ -332,29 +341,6 @@ public class WordCountVector
 					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(0);
 					else LineToPut += "," + String.valueOf(0);
 				}
-				bw.write(LineToPut+"\n");
-			}
-			bw.write("\n");
-			
-			// Write Topics
-			for (int i=0; i < ReverseTopics.size();++i)
-			{
-				if (i==0)
-					LineToPut = "DocumentId," + ReverseTopics.get(i);
-				else
-					LineToPut += "," + ReverseTopics.get(i);
-			}
-			bw.write(LineToPut + "\n\n");
-			
-			// Write the words vector, each line first parameter is the document id - afterwards the word count of the matching column
-			for (int i=0; i< Document.size();++i)
-			{
-				for(int j=0; TopicsClassificationMatrix[i] != null && j < TopicsClassificationMatrix[i].length; ++j)
-				{
-					if (j==0) LineToPut = String.valueOf(Document.get(i)) + "," + String.valueOf(TopicsClassificationMatrix[i][j]);
-					else LineToPut += "," + String.valueOf(TopicsClassificationMatrix[i][j]);
-				}
-				int StartVal = 0;
 				if (TopicsClassificationMatrix[i] != null ) StartVal = TopicsClassificationMatrix[i].length;
 				for (int j = StartVal; j < NumOfTopics; ++j)
 				{
@@ -363,8 +349,7 @@ public class WordCountVector
 				}
 				bw.write(LineToPut+"\n");
 			}
-			bw.write("\n");
-			
+			bw.write("\n");			
 			bw.close();
 		}
 		catch(Exception ex) 
