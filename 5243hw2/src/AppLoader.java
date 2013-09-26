@@ -40,7 +40,9 @@ public class AppLoader
 		System.out.println("Finished writing files.");
 		
 		// Start KNN Classification
-		//KNNPrediction.GetDataSource("../output/WordCount.csv", WordCountVector.Words.size());
+		KNNPrediction.GetDataSource("../output/WordCount.csv");
+		KNNPrediction.TrainKNNModel();
+		KNNPrediction.TestKNNModel();
 		
 		// Start Naive Bayes Classificaiton
 	}
