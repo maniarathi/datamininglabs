@@ -1,5 +1,7 @@
 import java.io.File;
 
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -13,7 +15,7 @@ public class NaiveBayesPrediction {
 	static Instances AllInstances;
 	static Instances TrainingInstances;
 	static Instances TestingInstances;
-	static NaiveBayesUpdateable NB;
+	static NaiveBayes NB;
 	
 	public static void GetDataSource(String FileName) {
 		loader = new CSVLoader();
@@ -36,7 +38,7 @@ public class NaiveBayesPrediction {
 		TestingInstances = new Instances(AllInstances, 0, testingSize);
 		
 		// Build the classifier
-		NB = new NaiveBayesUpdateable();
+		NB = new NaiveBayes();
 		try {
 			NB.buildClassifier(AllInstances);
 			for (int i = 0; i < TrainingInstances.numInstances(); i++) {
@@ -48,7 +50,17 @@ public class NaiveBayesPrediction {
 		}	
 	}
 	
+	// Test the Naive Bayes classifier
 	public static void TestNBModel() {
-		// TODO
+		try {
+			Evaluation NBTest = new Evaluation(TrainingInstances);
+			NBTest.evaluateModel(NB, TestingInstances);
+			// Print out results
+			System.out.println("Number of correctly classified instances: " + String.valueOf(NBTest.correct()));
+			System.out.println("Error rate: " + String.valueOf(NBTest.errorRate()));
+		} catch (Exception e) {
+			System.out.println("Failed to test Naive Bayes model: " + e.getMessage());
+		}
+		
 	}
 }
