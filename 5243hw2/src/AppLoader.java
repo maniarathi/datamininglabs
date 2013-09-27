@@ -26,7 +26,7 @@ public class AppLoader
 			XmlsPath = params[0];
 		
 		// Build the vector
-		ReadXmlAndBuildVector(XmlsPath);
+		/*ReadXmlAndBuildVector(XmlsPath);
 		WordCountVector.DecreaseVectorSize();
 		System.out.println("Finished building WordCountVector.");
 		ReadXmlAndBuildWordListVector(XmlsPath);
@@ -34,17 +34,21 @@ public class AppLoader
 		
 		// Write the vector to disk
 		System.out.println("Finished building vector, starting to write WordCountVector file and TopicsVector file.");
-		//WordCountVector.WriteToFile("output/WordCount.csv", "../output/TopicsVector.csv");
+		WordCountVector.WriteToFile("../output/WordCount.csv", "../output/TopicsVector.csv");
 		System.out.println("Finished building vector, starting to write WordListVector file.");
-		WordListVector.WriteToFile("output/WordList.csv");
-		System.out.println("Finished writing files.");
+		WordListVector.WriteToFile("../output/WordList.csv");
+		System.out.println("Finished writing files.");*/
 		
 		// Start KNN Classification
+		double split = 0.6;
+		KNNPrediction.GetPredictions("../output/WordCount.csv",9341,"../output/predictKNN6040.txt",split);
+		split = 0.8;
+		KNNPrediction.GetPredictions("../output/WordCount.csv",9341,"../output/predictKNN8020.txt",split);
 		//KNNPrediction.GetDataSource("output/WordCount.csv");
 		//KNNPrediction.TrainKNNModel();
 		//KNNPrediction.TestKNNModel();
 		
-		// Start Naive Bayes Classificaiton
+		// Start Naive Bayes Classification
 	}
 	
 	// Read all the xmls in a directory - and build the vectors

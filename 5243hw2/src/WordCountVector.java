@@ -351,13 +351,14 @@ public class WordCountVector
 				LineToPutInTopicsFile += "," + ReverseTopics.get(i);
 			}
 			LineToPutInWordsFile += ",Topics";*/
-			bww.write(LineToPutInWordsFile + "\n\n");
+			//bww.write(LineToPutInWordsFile + "\n\n");
 			//bwt.write(LineToPutInTopicsFile + "\n\n");
 			
 			
 			// Write the words vector, each line first parameter is the document id - afterwards the word count of the matching column
 			for (int i=0; i< Document.size();++i)
 			{
+				System.out.println("Writing to file Document " + String.valueOf(i) + " to WordCount.csv");
 				for(int j=0; TopicsTrainingMatrix[i] != null && j < TopicsTrainingMatrix[i].length; ++j)
 				{
 					if (j==0) LineToPutInWordsFile = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(TopicsTrainingMatrix[i][j]);
@@ -382,7 +383,7 @@ public class WordCountVector
 				//bww.write(LineToPutInWordsFile+"\n");
 				//bwt.write(LineToPutInTopicsFile+"\n");
 			}
-			bww.write("\n");
+			//bww.write("\n");
 			//bwt.write("\n");
 			bww.close();
 			//bwt.close();
