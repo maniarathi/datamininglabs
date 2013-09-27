@@ -20,7 +20,8 @@ public class WordListVector
 	static public void AddDocumentToTopicVector(int DocId, String[] DocumentTopics, String[] Title, String[] Body)
 	{
 		// If nothing to do - exit
-		if (DocumentTopics == null || (Title == null && Body == null)) return;
+		//if (DocumentTopics == null || (Title == null && Body == null)) return;
+		if (!WordCountVector.Document.containsKey(DocId)) return;
 		
 		// Build the words the same way as in the WordCountVector
 		HashSet<String> RetVal = new HashSet<>();
@@ -29,7 +30,7 @@ public class WordListVector
 		{
 			for (String CurrTitle : Title)
 			{
-				CurrTitle = CurrTitle.replaceAll("\\W+", " "); // Removes all non character letters
+				CurrTitle = CurrTitle.replaceAll("[\\W\\d]+", " "); // Removes all non character letters
 				String[] TitleWords = CurrTitle.split(" ");
 				
 				for (String word : TitleWords)
@@ -37,7 +38,7 @@ public class WordListVector
 					stemmer.setCurrent(word);
 					if (stemmer.stem())
 					{
-						word =stemmer.getCurrent();
+						word =stemmer.getCurrent().toLowerCase();
 						if (WordCountVector.Words.containsKey(word) && !RetVal.contains(word))
 						{
 							RetVal.add(word);
@@ -52,7 +53,7 @@ public class WordListVector
 		{
 			for (String CurrBody : Body)
 			{
-				CurrBody = CurrBody.replaceAll("\\W+", " "); // Removes all non character letters
+				CurrBody = CurrBody.replaceAll("[\\W\\d]+", " "); // Removes all non character letters
 				String[] BodyWords = CurrBody.split(" ");
 				
 				for (String word : BodyWords)
@@ -60,7 +61,7 @@ public class WordListVector
 					stemmer.setCurrent(word);
 					if (stemmer.stem())
 					{
-						word =stemmer.getCurrent();
+						word =stemmer.getCurrent().toLowerCase();
 						if (WordCountVector.Words.containsKey(word) && !RetVal.contains(word))
 						{
 							RetVal.add(word);
@@ -106,19 +107,28 @@ public class WordListVector
 			// Write words
 			for (int id : WordListVector.keySet())
 			{
-				LineToPut = String.valueOf(id)+ ":{";
+				LineToPut = String.valueOf(id)+ ",";
 				boolean first = true;
 				for (String word : WordListVector.get(id))
 				{
 					if (first) {LineToPut += word; first = false;}
 					else LineToPut += "," + word;
 				}
-				LineToPut += "}\n";
-				bw.write(LineToPut);
+				LineToPut += ",";
+				
+				int i = WordCountVector.Document.get(id);
+				for(int j=0; WordCountVector.TopicsClassificationMatrix[i] != null && j < WordCountVector.Topics.size() && WordCountVector.TopicsClassificationMatrix[i].length >j; ++j)
+				{
+					if (WordCountVector.TopicsClassificationMatrix[i][j] > 0)
+					{
+						bw.write(LineToPut +  ReverseTopics.get(j) + "\n");
+					}
+				}
+				//bw.write(LineToPut);
 			}
 			bw.write("\n");
 			
-		
+			/*
 			// Write Topics -- This is the same as in the WordCountVector
 			for (int i=0; i < ReverseTopics.size();++i)
 			{
@@ -147,12 +157,12 @@ public class WordListVector
 				bw.write(LineToPut+"\n");
 			}
 			bw.write("\n");
-			
+			*/
 			bw.close();
 		}
 		catch(Exception ex) 
 		{
-			System.out.println("Failed to save file. error: " + ex.getMessage());
+			System.out.println("Failed to save file. error: " + ex.getMessage() + "\n" + ex.getStackTrace().toString());
 		}
 		bw = null;
 		fis = null;

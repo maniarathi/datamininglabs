@@ -71,7 +71,7 @@ public class WordCountVector
 		{
 			for (String CurrTitle : Title)
 			{
-				CurrTitle = CurrTitle.replaceAll("\\W+", " "); // Removes all non character letters
+				CurrTitle = CurrTitle.replaceAll("[\\W\\d]+", " "); // Removes all non character letters
 				String[] TitleWords = CurrTitle.split(" ");
 				
 				for (String word : TitleWords)
@@ -86,7 +86,7 @@ public class WordCountVector
 		{
 			for (String CurrBody : Body)
 			{
-				CurrBody = CurrBody.replaceAll("\\W+", " "); // Removes all non character letters
+				CurrBody = CurrBody.replaceAll("[\\W\\d]+", " "); // Removes all non character letters
 				String[] BodyWords = CurrBody.split(" ");
 				
 				for (String word : BodyWords)
@@ -389,7 +389,7 @@ public class WordCountVector
 		}
 		catch(Exception ex) 
 		{
-			System.out.println("Failed to save file. error: " + ex.getMessage());
+			System.out.println("Failed to save file. error: " + ex.getMessage() + "\n " + ex.getStackTrace());
 		}
 		bww = null;
 		//bwt = null;
