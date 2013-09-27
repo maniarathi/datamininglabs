@@ -110,8 +110,9 @@ public class KNNPrediction {
 			fos = new FileOutputStream(OutputFile);
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 			
-			System.out.println("Predicting documents...");
+			
 			for (Integer i : testingDocIds) {
+				System.out.println("Predicting documents " + String.valueOf(i));
 				Integer closestOne, closestTwo, closestThree;
 				closestOne = closestTwo = closestThree = -1;
 				double valueOne, valueTwo, valueThree;

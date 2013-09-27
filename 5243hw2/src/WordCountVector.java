@@ -333,7 +333,7 @@ public class WordCountVector
 			//bwt		= new BufferedWriter(new OutputStreamWriter(fist));
 			
 			String LineToPutInWordsFile = "";
-			//String LineToPutInTopicsFile = "";
+			String LineToPutInTopicsFile = "";
 			
 			// Write words across the top of the CSV file
 			for (int i=0; i < ReverseWords.size();++i)
@@ -344,14 +344,14 @@ public class WordCountVector
 					LineToPutInWordsFile += "," + ReverseWords.get(i);
 			}
 			// Write topics across the top of the CSV file
-			/*for (int i=0; i < ReverseTopics.size();++i)
+			for (int i=0; i < ReverseTopics.size();++i)
 			{
 				if (i==0)
 					LineToPutInTopicsFile = "DocumentId," + ReverseWords.get(i);
 				LineToPutInTopicsFile += "," + ReverseTopics.get(i);
 			}
-			LineToPutInWordsFile += ",Topics";*/
-			//bww.write(LineToPutInWordsFile + "\n\n");
+			LineToPutInWordsFile += ",Topics";
+			bww.write(LineToPutInWordsFile + "\n\n");
 			//bwt.write(LineToPutInTopicsFile + "\n\n");
 			
 			
@@ -380,10 +380,10 @@ public class WordCountVector
 					}
 				}
 				
-				//bww.write(LineToPutInWordsFile+"\n");
+				bww.write(LineToPutInWordsFile+"\n");
 				//bwt.write(LineToPutInTopicsFile+"\n");
 			}
-			//bww.write("\n");
+			bww.write("\n");
 			//bwt.write("\n");
 			bww.close();
 			//bwt.close();

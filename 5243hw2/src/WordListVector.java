@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import org.tartarus.snowball.ext.PorterStemmer;
 
 /// Roee Ebenstein
@@ -107,6 +108,7 @@ public class WordListVector
 			// Write words
 			for (int id : WordListVector.keySet())
 			{
+				System.out.println("Writing to file Document " + String.valueOf(id) + " to WordList.csv");
 				LineToPut = String.valueOf(id)+ ",";
 				boolean first = true;
 				for (String word : WordListVector.get(id))

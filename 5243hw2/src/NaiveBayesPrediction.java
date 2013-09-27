@@ -5,6 +5,7 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
+import weka.core.converters.ConverterUtils.DataSource;
 
 
 public class NaiveBayesPrediction {
@@ -16,30 +17,44 @@ public class NaiveBayesPrediction {
 	static Instances TestingInstances;
 	static NaiveBayes NB;
 	
-	public static void GetDataSource(String FileName) {
-		loader = new CSVLoader();
+	public static void GetPredictions(String FileName) {
+		// Load data
+		System.out.println("Loading data for Naive Bayes");
+		GetDataSource(FileName);
+		// Predict
+		System.out.println("Performing Naive Bayes prediction...");
+		TrainNBModel();
+		// Evaluate
+		System.out.println("Evaluating Naive Bayes results...");
+		TestNBModel();
+	}
+	
+	private static void GetDataSource(String FileName) {
 		try {
-			loader.setSource(new File(FileName));
-			AllInstances = loader.getStructure();
+			DataSource source = new DataSource(FileName);
+			AllInstances = source.getDataSet();
+			System.out.println(AllInstances.numInstances());
 			// The last attribute of the data source is the class
-			AllInstances.setClassIndex(AllInstances.numInstances() - 1);
+			AllInstances.setClassIndex(AllInstances.numAttributes() - 1);
 		} catch (Exception e) {
 			System.out.println("Failed to extract data from file for training Naive Bayes model: " + e.getMessage());
 		}
-		
+
 	}
 	
-	public static void TrainNBModel() {
+	private static void TrainNBModel() {
 		// Split the instances of the data
 		int trainingSize = (int) Math.round(AllInstances.numInstances() * TrainingSplit);
 		int testingSize = AllInstances.numInstances() - trainingSize;
 		TrainingInstances = new Instances(AllInstances, 0, trainingSize);
+		TrainingInstances.setClassIndex(TrainingInstances.numAttributes() - 1);
 		TestingInstances = new Instances(AllInstances, 0, testingSize);
+		TestingInstances.setClassIndex(TestingInstances.numAttributes() - 1);
 		
 		// Build the classifier
 		NB = new NaiveBayes();
 		try {
-			NB.buildClassifier(AllInstances);
+			//NB.buildClassifier(AllInstances);
 			for (int i = 0; i < TrainingInstances.numInstances(); i++) {
 				Instance target = TrainingInstances.instance(i);
 				NB.updateClassifier(target);
@@ -50,8 +65,9 @@ public class NaiveBayesPrediction {
 	}
 	
 	// Test the Naive Bayes classifier
-	public static void TestNBModel() {
+	private static void TestNBModel() {
 		try {
+			System.out.println(TrainingInstances.numInstances());
 			Evaluation NBTest = new Evaluation(TrainingInstances);
 			NBTest.evaluateModel(NB, TestingInstances);
 			// Print out results
