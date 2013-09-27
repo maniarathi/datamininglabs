@@ -44,11 +44,11 @@ public class AppLoader
 		KNNPrediction.GetPredictions("../output/WordCount.csv",9341,"../output/predictKNN6040.txt",split);
 		split = 0.8;
 		KNNPrediction.GetPredictions("../output/WordCount.csv",9341,"../output/predictKNN8020.txt",split);
-		//KNNPrediction.GetDataSource("output/WordCount.csv");
-		//KNNPrediction.TrainKNNModel();
-		//KNNPrediction.TestKNNModel();
 		
 		// Start Naive Bayes Classification
+		//NaiveBayesPrediction.GetDataSource("../output/WordCount.csv");
+		//NaiveBayesPrediction.TrainNBModel();
+		//NaiveBayesPrediction.TestNBModel();
 	}
 	
 	// Read all the xmls in a directory - and build the vectors

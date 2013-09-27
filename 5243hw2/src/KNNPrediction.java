@@ -42,11 +42,7 @@ public class KNNPrediction {
 				String[] data = line.split(",");
 				// The first entity is the document number
 				Integer docNum = Integer.parseInt(data[0]);
-				System.out.println("Parsing doc " + String.valueOf(docNum));
-
-				if(docNum == 11972) {
-					System.out.println("Stuff");
-				}
+				//System.out.println("Parsing doc " + String.valueOf(docNum));
 				
 				// If the docNum is less than the size of the training set, then put the data into training sets
 				if (numDocsParsed < numTraining || (numDocsParsed == numTraining && docNum.equals(currentDocNum))) {
@@ -113,11 +109,11 @@ public class KNNPrediction {
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 			
 			for (Integer i : testingDocIds) {
-				System.out.println("Predicting doc " + String.valueOf(i));
+				//System.out.println("Predicting doc " + String.valueOf(i));
 				Integer closestOne, closestTwo, closestThree;
 				closestOne = closestTwo = closestThree = -1;
 				double valueOne, valueTwo, valueThree;
-				valueOne = valueTwo = valueThree = -1;
+				valueOne = valueTwo = valueThree = Integer.MAX_VALUE;
 				ArrayList<Integer> targetData = TestingData.get(i);
 				
 				// Iterate through the testing set to determine which three entities are the closest
@@ -128,19 +124,19 @@ public class KNNPrediction {
 					double distance = CalculateEuclidean(targetData, compareData);
 					// Check if distance is bigger than any of the three stored
 					// If so, store it and kick out the smallest one if applicable.
-					if (distance > valueOne) {
+					if (distance < valueOne) {
 						valueThree = valueTwo;
 						closestThree = closestTwo;
 						valueTwo = valueOne;
 						closestTwo = closestOne;
 						valueOne = distance;
 						closestOne = j;
-					} else if (distance > valueTwo) {
+					} else if (distance < valueTwo) {
 						valueThree = valueTwo;
 						closestThree = closestTwo;
 						valueTwo = distance;
 						closestTwo = j;
-					} else if (distance > valueThree) {
+					} else if (distance < valueThree) {
 						valueThree = distance;
 						closestThree = j;
 					}
