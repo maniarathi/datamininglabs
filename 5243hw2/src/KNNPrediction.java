@@ -30,6 +30,7 @@ public class KNNPrediction {
 		// Calculate the number of documents that should go into the training set.
 		int numTraining = (int) Math.round(NumDocs * TrainingSplit);
 		try {
+			System.out.println("Loading data...");
 			BufferedReader br = new BufferedReader(new FileReader(FileName));
 			String line;
 			Integer currentDocNum = null;
@@ -68,8 +69,8 @@ public class KNNPrediction {
 						TrainingClasses.put(docNum, classes);
 						currentDocNum = docNum;
 					}
-				} else {
-					numDocsParsed++;
+				} else if (numDocsParsed < NumDocs || (numDocsParsed == NumDocs && docNum.equals(currentDocNum))){
+					
 					if (docNum.equals(currentDocNum)) {
 						// Only add the additional topic to the class list
 						// Fetch the current list of topics for the document number
@@ -79,6 +80,7 @@ public class KNNPrediction {
 						// Write it back
 						TestingClasses.put(docNum, currentClasses);
 					} else {
+						numDocsParsed++;
 						// Add the data to the TestingData map
 						ArrayList<Integer> attributes = new ArrayList<Integer>();
 						for (int i = 1; i < data.length - 1; i++) {
@@ -108,8 +110,8 @@ public class KNNPrediction {
 			fos = new FileOutputStream(OutputFile);
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 			
+			System.out.println("Predicting documents...");
 			for (Integer i : testingDocIds) {
-				//System.out.println("Predicting doc " + String.valueOf(i));
 				Integer closestOne, closestTwo, closestThree;
 				closestOne = closestTwo = closestThree = -1;
 				double valueOne, valueTwo, valueThree;
@@ -144,7 +146,8 @@ public class KNNPrediction {
 				
 				// Output the topics
 				Set<String> predictedTopics = new HashSet<String>();
-				String LineToWrite = String.valueOf(i);
+				StringBuilder LineToWrite = new StringBuilder(); 
+				LineToWrite.append(String.valueOf(i));
 				if (closestOne != -1) {
 					// Write the closest topics
 					ArrayList<String> closestOneTopics = TrainingClasses.get(closestOne);
@@ -167,11 +170,14 @@ public class KNNPrediction {
 					}
 				}
 				for (String topic : predictedTopics) {
-					LineToWrite += "," + topic;
+					LineToWrite.append(",");
+					LineToWrite.append(topic);
 				}
 
 				Predictions.put(i, predictedTopics);
-				bw.write(LineToWrite + "\n");
+				LineToWrite.append("\n");
+				bw.write(LineToWrite.toString());
+				bw.write("\n");
 			}
 			bw.close();
 		} catch (Exception e) {
@@ -193,7 +199,9 @@ public class KNNPrediction {
 			totalClassified++;
 		}
 		System.out.println("Correctly classified " + String.valueOf(correctlyClassified) + " documents out of " + String.valueOf(totalClassified));
-		System.out.println("Percentage = " + String.valueOf((correctlyClassified/totalClassified)*100));
+		double errorRate = (double)(totalClassified - correctlyClassified)/(double)totalClassified;
+		errorRate *= 100;
+		System.out.println("Error rate = " + String.valueOf(errorRate));
 	}
 	
 	static private double CalculateEuclidean(ArrayList<Integer> one, ArrayList<Integer> two) {
@@ -206,7 +214,7 @@ public class KNNPrediction {
 	
 	static private boolean TestSimilarity(Set<String> actual, Set<String> predict) {
 		boolean val = false;
-		if (actual.containsAll(predict)) {
+		if (actual.retainAll(predict)) {
 			val = true;
 		}
 		return val;
