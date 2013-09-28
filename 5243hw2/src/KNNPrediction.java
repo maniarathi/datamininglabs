@@ -198,6 +198,7 @@ public class KNNPrediction {
 		// EVALUATION STEP
 		int correctlyClassified = 0;
 		int totalClassified = 0;
+		int AtLeastOne = 0;
 		for (Integer i : Predictions.keySet()) {
 			// Get the set of actual topics
 			Set<String> actualTopics = new HashSet<String>();
@@ -207,12 +208,18 @@ public class KNNPrediction {
 			if (TestSimilarity(actualTopics, Predictions.get(i))) {
 				correctlyClassified++;
 			}
+			if (TestSimilarity2(actualTopics, Predictions.get(i))) {
+				AtLeastOne++;
+			}
 			totalClassified++;
 		}
 		System.out.println("Correctly classified " + String.valueOf(correctlyClassified) + " documents out of " + String.valueOf(totalClassified));
+		System.out.println("At least one Correctly classified " + String.valueOf(AtLeastOne) + " documents out of " + String.valueOf(totalClassified));
 		double errorRate = (double)(totalClassified - correctlyClassified)/(double)totalClassified;
 		errorRate *= 100;
-		System.out.println("Error rate = " + String.valueOf(errorRate));
+		double errorRate2 = (double)(totalClassified - AtLeastOne)/(double)totalClassified;
+		errorRate2 *= 100;
+		System.out.println("Error rate = " + String.valueOf(errorRate) + ", For at least one = " + String.valueOf(errorRate2));
 	}
 	
 	static private double CalculateEuclidean(ArrayList<Integer> one, ArrayList<Integer> two) {
@@ -228,6 +235,15 @@ public class KNNPrediction {
 		if (actual.retainAll(predict)) {
 			val = true;
 		}
+		return val;
+	}
+	static private boolean TestSimilarity2(Set<String> actual, Set<String> predict) {
+		boolean val = false;
+		for (String s : actual)
+			if (predict.contains(s)) {
+				val = true;
+				return val;
+			}
 		return val;
 	}
 }
