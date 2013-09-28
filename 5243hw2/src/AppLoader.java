@@ -36,7 +36,7 @@ public class AppLoader
 		System.out.println("Finished building vector, starting to write WordCountVector file and TopicsVector file.");
 		WordCountVector.WriteToFile("../output/WordCount.csv", "../output/TopicsVector.csv");
 		System.out.println("Finished building vector, starting to write WordListVector file.");
-		WordListVector.WriteToFile("../output/WordList.csv");
+		//WordListVector.WriteToFile("../output/WordList.csv");
 		System.out.println("Finished writing files.");
 		
 		// Start KNN Classification

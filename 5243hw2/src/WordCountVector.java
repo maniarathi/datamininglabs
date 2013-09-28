@@ -343,6 +343,7 @@ public class WordCountVector
 				else
 					LineToPutInWordsFile += "," + ReverseWords.get(i);
 			}
+			LineToPutInWordsFile += ",TOPICS";
 			// Write topics across the top of the CSV file
 			/*for (int i=0; i < ReverseTopics.size();++i)
 			{
@@ -351,7 +352,7 @@ public class WordCountVector
 				LineToPutInTopicsFile += "," + ReverseTopics.get(i);
 			}
 			LineToPutInWordsFile += ",Topics";*/
-			bww.write(LineToPutInWordsFile + "\n\n");
+			bww.write(LineToPutInWordsFile);
 			//bwt.write(LineToPutInTopicsFile + "\n\n");
 
 
@@ -370,20 +371,18 @@ public class WordCountVector
 					if (j==0) LineToPutInWordsFile = String.valueOf(ReverseDocumentIds.get(i)) + "," + String.valueOf(0);
 					else LineToPutInWordsFile += "," + String.valueOf(0);
 				}
-				String BasicLine = LineToPutInWordsFile + ",";
+				String BasicLine = "\n" + LineToPutInWordsFile + ",";
 				for(int j=0; TopicsClassificationMatrix[i] != null && j < Topics.size() && TopicsClassificationMatrix[i].length >j; ++j)
 				{
 					if (TopicsClassificationMatrix[i][j] > 0)
 					{
-						bww.write(BasicLine +  ReverseTopics.get(j) + "\n");
+						bww.write(BasicLine +  ReverseTopics.get(j));
 					}
 				}
 
 				//bww.write(LineToPutInWordsFile+"\n");
 				//bwt.write(LineToPutInTopicsFile+"\n");
 			}
-			bww.write("\n");
-			//bwt.write("\n");
 			bww.close();
 			//bwt.close();
 		}

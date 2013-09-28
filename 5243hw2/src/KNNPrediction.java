@@ -18,9 +18,13 @@ public class KNNPrediction {
 	static Map<Integer, ArrayList<Integer>> TestingData;
 	static Map<Integer, ArrayList<String>> TestingClasses;
 	static Map<Integer, Set<String>> Predictions;
+	static long startTime;
+	static long endTime;
+	static long duration;
 	
 	static public void GetPredictions(String FileName, int NumDocs, String OutputFile, double split) {
 		TrainingSplit = split;
+		startTime = System.nanoTime();
 		// READ FILE CONTENTS TO STRUCTURE
 		TrainingData = new HashMap<Integer, ArrayList<Integer>>();
 		TrainingClasses = new HashMap<Integer, ArrayList<String>>();
@@ -35,8 +39,10 @@ public class KNNPrediction {
 			String line;
 			Integer currentDocNum = null;
 			int numDocsParsed = 0;
+			int lineNum = 0;
 			while ((line = br.readLine()) != null) {
-				if (line.length() == 0) {
+				if (line.length() == 0 || lineNum == 0) {
+					lineNum++;
 					continue;
 				}
 				// Separate line by commas
@@ -99,11 +105,12 @@ public class KNNPrediction {
 		} catch (Exception e) {
 			System.out.println("Was unable to read " + FileName + " for KNN model: " + e.getMessage());
 		}
-		
+		endTime = System.nanoTime();
+		duration = endTime - startTime;
+		System.out.println("Time to build KNN model " + String.valueOf(duration));
 		
 		// PREDICTION STEP
-		Date d = new Date();
-		
+		startTime = System.nanoTime();
 		Set<Integer> testingDocIds = TestingData.keySet();
 		FileOutputStream fos;
 		try {
@@ -184,6 +191,9 @@ public class KNNPrediction {
 		} catch (Exception e) {
 			System.out.println("Unable to predict topics for KNN model: " + e.getMessage());
 		}
+		endTime = System.nanoTime();
+		duration = endTime - startTime;
+		System.out.println("Time to predict entities: " + String.valueOf(duration));
 		
 		// EVALUATION STEP
 		int correctlyClassified = 0;
