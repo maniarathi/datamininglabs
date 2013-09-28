@@ -16,30 +16,42 @@ public class NaiveBayesPrediction {
 	static Instances TrainingInstances;
 	static Instances TestingInstances;
 	static NaiveBayes NB;
+	static long startTime;
+	static long endTime;
+	static long duration;
 	
-	public static void GetPredictions(String FileName) {
+	public static void GetPredictions(String FileName, double Split) {
+		TrainingSplit = Split;
+		TestSplit = 1 - TrainingSplit;
 		// Load data
+		startTime = System.nanoTime();
 		System.out.println("Loading data for Naive Bayes");
 		GetDataSource(FileName);
 		// Predict
 		System.out.println("Performing Naive Bayes prediction...");
 		TrainNBModel();
+		endTime = System.nanoTime();
+		duration = endTime - startTime;
+		System.out.println("Time to build Naive Bayes Model: " + String.valueOf(duration));
 		// Evaluate
+		startTime = System.nanoTime();
 		System.out.println("Evaluating Naive Bayes results...");
 		TestNBModel();
+		endTime = System.nanoTime();
+		duration = endTime - startTime;
+		System.out.println("Time to test Naive Bayes Model: " + String.valueOf(duration));
 	}
 	
 	private static void GetDataSource(String FileName) {
+		
 		try {
 			DataSource source = new DataSource(FileName);
 			AllInstances = source.getDataSet();
-			System.out.println(AllInstances.numInstances());
 			// The last attribute of the data source is the class
 			AllInstances.setClassIndex(AllInstances.numAttributes() - 1);
 		} catch (Exception e) {
 			System.out.println("Failed to extract data from file for training Naive Bayes model: " + e.getMessage());
 		}
-
 	}
 	
 	private static void TrainNBModel() {
@@ -54,7 +66,7 @@ public class NaiveBayesPrediction {
 		// Build the classifier
 		NB = new NaiveBayes();
 		try {
-			//NB.buildClassifier(AllInstances);
+			NB.buildClassifier(AllInstances);
 			for (int i = 0; i < TrainingInstances.numInstances(); i++) {
 				Instance target = TrainingInstances.instance(i);
 				NB.updateClassifier(target);
@@ -67,7 +79,6 @@ public class NaiveBayesPrediction {
 	// Test the Naive Bayes classifier
 	private static void TestNBModel() {
 		try {
-			System.out.println(TrainingInstances.numInstances());
 			Evaluation NBTest = new Evaluation(TrainingInstances);
 			NBTest.evaluateModel(NB, TestingInstances);
 			// Print out results
