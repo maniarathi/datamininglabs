@@ -196,7 +196,13 @@ public class KNNPrediction {
 		System.out.println("Time to predict entities: " + String.valueOf(duration));
 		
 		// EVALUATION STEP
-		int correctlyClassified = 0;
+		// Evaluation 1: Check if at least one of the actual topics matches the predicted topics.
+		// Evaluation 2: Check if all the actual topics matches the predicted topics.
+		// Evaluation 3: Check what percentage of the topics were misclassified (i.e. the predicted topic is not in the actual topic)
+		int atLeastOneClassified = 0;
+		int perfectClassification = 0;
+		int misClassified = 0;
+		int totalTopicsClassified = 0;
 		int totalClassified = 0;
 		for (Integer i : Predictions.keySet()) {
 			// Get the set of actual topics
@@ -204,15 +210,29 @@ public class KNNPrediction {
 			for (String t : TestingClasses.get(i)) {
 				actualTopics.add(t);
 			}
-			if (TestSimilarity(actualTopics, Predictions.get(i))) {
-				correctlyClassified++;
+			Set<String> predictedTopics = Predictions.get(i);
+			totalTopicsClassified += predictedTopics.size();
+			boolean changed = predictedTopics.retainAll(actualTopics);
+			if (predictedTopics.size() > 0) {
+				atLeastOneClassified++;
+			}
+			if (changed) {
+				// Some topics were removed because they did not exist in the actual topics list
+				misClassified += (Predictions.get(i).size() - predictedTopics.size());
+			}
+			// Check how many were perfectly classified
+			predictedTopics = Predictions.get(i); // reset because retainAll may have changed the set.
+			if (predictedTopics.removeAll(actualTopics)) {
+				if (predictedTopics.size() == 0) {
+					perfectClassification++;
+				}
 			}
 			totalClassified++;
 		}
-		System.out.println("Correctly classified " + String.valueOf(correctlyClassified) + " documents out of " + String.valueOf(totalClassified));
-		double errorRate = (double)(totalClassified - correctlyClassified)/(double)totalClassified;
-		errorRate *= 100;
-		System.out.println("Error rate = " + String.valueOf(errorRate));
+		
+		System.out.println("Percentage of documents that had at least one topic correctly classified: " + String.valueOf((double)atLeastOneClassified/(double)totalClassified));
+		System.out.println("Percentage of documents that were perfectly classified: " + String.valueOf((double)perfectClassification/(double)totalClassified));
+		System.out.println("Percentage of erronous topics classified: " + String.valueOf((double)misClassified/(double)totalTopicsClassified));
 	}
 	
 	static private double CalculateEuclidean(ArrayList<Integer> one, ArrayList<Integer> two) {
@@ -221,13 +241,5 @@ public class KNNPrediction {
 			sum += Math.pow(Math.abs(one.get(i) - two.get(i)), 2);
 		}
 		return sum;
-	}
-	
-	static private boolean TestSimilarity(Set<String> actual, Set<String> predict) {
-		boolean val = false;
-		if (actual.retainAll(predict)) {
-			val = true;
-		}
-		return val;
 	}
 }
