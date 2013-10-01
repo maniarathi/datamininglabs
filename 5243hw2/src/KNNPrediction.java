@@ -212,27 +212,29 @@ public class KNNPrediction {
 			}
 			Set<String> predictedTopics = Predictions.get(i);
 			totalTopicsClassified += predictedTopics.size();
-			boolean changed = predictedTopics.retainAll(actualTopics);
-			if (predictedTopics.size() > 0) {
+			boolean foundOneMatch = false;
+			for (String topic : actualTopics) {
+				if (predictedTopics.contains(topic)) {
+					foundOneMatch = true;
+					predictedTopics.remove(topic);
+				}
+			}
+			if (foundOneMatch) {
 				atLeastOneClassified++;
 			}
-			if (changed) {
-				// Some topics were removed because they did not exist in the actual topics list
-				misClassified += (Predictions.get(i).size() - predictedTopics.size());
-			}
+			misClassified += predictedTopics.size();
 			// Check how many were perfectly classified
 			predictedTopics = Predictions.get(i); // reset because retainAll may have changed the set.
-			if (predictedTopics.removeAll(actualTopics)) {
-				if (predictedTopics.size() == 0) {
-					perfectClassification++;
-				}
+			
+			if (predictedTopics.containsAll(actualTopics)) {
+				perfectClassification++;
 			}
 			totalClassified++;
 		}
 		
-		System.out.println("Percentage of documents that had at least one topic correctly classified: " + String.valueOf((double)atLeastOneClassified/(double)totalClassified));
-		System.out.println("Percentage of documents that were perfectly classified: " + String.valueOf((double)perfectClassification/(double)totalClassified));
-		System.out.println("Percentage of erronous topics classified: " + String.valueOf((double)misClassified/(double)totalTopicsClassified));
+		System.out.println("Percentage of documents that had at least one topic correctly classified: " + String.valueOf((double)atLeastOneClassified*100/(double)totalClassified));
+		System.out.println("Percentage of documents that were perfectly classified: " + String.valueOf((double)perfectClassification*100/(double)totalClassified));
+		System.out.println("Percentage of erronous topics classified: " + String.valueOf((double)misClassified*100/(double)totalTopicsClassified));
 	}
 	
 	static private double CalculateEuclidean(ArrayList<Integer> one, ArrayList<Integer> two) {
