@@ -41,9 +41,9 @@ public class AppLoader
 		
 		// Start KNN Classification
 		double split = 0.6;
-		KNNPrediction.GetPredictions("output/WordCount.csv",1000,"output/predictKNN6040.txt",split);
+		KNNPrediction.GetPredictions("output/WordCount.csv",9342,"output/predictKNN6040.txt",split);
 		split = 0.8;
-		KNNPrediction.GetPredictions("output/WordCount.csv",1000,"output/predictKNN8020.txt",split);
+		KNNPrediction.GetPredictions("output/WordCount.csv",9342,"output/predictKNN8020.txt",split);
 		
 		// Start Naive Bayes Classification
 		NaiveBayesPrediction.GetPredictions("output/WordCount.csv", 0.8);

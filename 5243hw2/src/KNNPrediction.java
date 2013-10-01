@@ -119,7 +119,7 @@ public class KNNPrediction {
 			
 			
 			for (Integer i : testingDocIds) {
-				System.out.println("Predicting documents " + String.valueOf(i));
+				//System.out.println("Predicting documents " + String.valueOf(i));
 				Integer closestOne, closestTwo, closestThree;
 				closestOne = closestTwo = closestThree = -1;
 				double valueOne, valueTwo, valueThree;
