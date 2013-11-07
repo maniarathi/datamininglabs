@@ -11,6 +11,7 @@ public class Lab3Loader {
 	public static int numberOfCentroids = 4;
 	
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
 		// Open up the file WordCount.csv for reading
 		try {
 			// Container to hold document number against its coordinate
@@ -46,7 +47,7 @@ public class Lab3Loader {
 			br.close();
 			
 			// Perform K-means on the data collected
-			KMeansClustering cluster = new KMeansClustering(data,16,0);
+			KMeansClustering cluster = new KMeansClustering(data,64,0);
 			cluster.performClustering();
 			
 		} catch (FileNotFoundException e) {
@@ -55,6 +56,9 @@ public class Lab3Loader {
 		} catch (IOException e) {
 			System.out.println("ERROR: Failed to read a line from WordCount.csv!");
 		}
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println("Total running time: " + ((float)(endTime - startTime)/1000.0));
 
 	}
 
