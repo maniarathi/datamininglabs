@@ -47,7 +47,11 @@ public class Lab3Loader {
 			br.close();
 			
 			// Perform K-means on the data collected
-			KMeansClustering cluster = new KMeansClustering(data,64,0);
+			//KMeansClustering cluster = new KMeansClustering(data,256,0);
+			//cluster.performClustering();
+			
+			// Perform Hierarchical clustering on the data collected
+			HierarchicalClustering cluster = new HierarchicalClustering(data,4);
 			cluster.performClustering();
 			
 		} catch (FileNotFoundException e) {

@@ -52,7 +52,7 @@ public class KMeansClustering {
 				float smallestDistance = Float.MAX_VALUE;
 				Integer smallestCentroid = 0;
 				for (int j = 0; j < numCentroids; j++) {
-					float currentDistance = measureEuclidean(data.get(i),centroidLocations.get(j));
+					float currentDistance = measureManhattan(data.get(i),centroidLocations.get(j));
 					if (currentDistance <= smallestDistance) {
 						smallestDistance = currentDistance;
 						smallestCentroid = j;
@@ -99,7 +99,7 @@ public class KMeansClustering {
 				}
 				
 				// Check if centroid needs to be updated
-				float difference = measureEuclideanFloat(newCentroidLocation,centroidLocations.get(i));
+				float difference = measureManhattanFloat(newCentroidLocation,centroidLocations.get(i));
 				System.out.println("Difference for centroid " + i + " = " + difference);
 				if (difference > convergenceThreshold) {
 					// Update centroid
