@@ -1,43 +1,116 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 
 public class HierarchicalClustering {
-	HashMap<Integer, ArrayList<Integer>> data;
-	int numOfClusters;
+	private HashMap<Integer, ArrayList<Integer>> data;
+	private int numOfClusters;
+	private ArrayList<ArrayList<Float>> distanceMatrix;
 	
 	public HierarchicalClustering(HashMap<Integer, ArrayList<Integer>> d, int n) {
 		data = d;
 		numOfClusters = n;
 	}
 	
-	public void performClustering() {
-		// Create a distance matrix between each of the data points
-		ArrayList<ArrayList<Float>> distanceMatrix = new ArrayList<ArrayList<Float>>();
-		
-		// Get an ordered array of the document numbers
-		ArrayList<Integer> docNums = new ArrayList<Integer>();
-		Set<Integer> docNumbers = data.keySet();
-		for (Integer i : docNumbers) {
-			docNums.add(i);
-		}
-		
-		// Populate the matrix
-		System.out.println("Creating the distance matrix...");
-		for (int i = 0; i < docNums.size(); i++) {
-			System.out.println("Computing " + i + " out of " + docNums.size());
-			// Compute distances
-			ArrayList<Float> rowDist = new ArrayList<Float>();
-			for (int j = 0; j < docNums.size(); j++) {
-				float dist = measureEuclidean(data.get(docNums.get(i)),data.get(docNums.get(j)));
-				rowDist.add(dist);
+	public void createDistanceMatrixManhattan() {
+		// Create a file to hold the contents of the distance matrix
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("../output/DistanceMatrixManhattan.txt"), "utf-8"));
+			
+			// Get an ordered array of the document numbers
+			ArrayList<Integer> docNums = new ArrayList<Integer>();
+			Set<Integer> docNumbers = data.keySet();
+			for (Integer i : docNumbers) {
+				docNums.add(i);
 			}
-			// Add the row
-			distanceMatrix.add(rowDist);
+			
+			// Populate the matrix file
+			System.out.println("Creating the Manhattan distance matrix...");
+			for (int i = 0; i < docNums.size(); i++) {
+				System.out.println("Computing " + i + " out of " + docNums.size());
+				// Compute distances
+				ArrayList<Float> rowDist = new ArrayList<Float>();
+				for (int j = 0; j < docNums.size(); j++) {
+					float dist = measureManhattan(data.get(docNums.get(i)),data.get(docNums.get(j)));
+					rowDist.add(dist);
+				}
+				// Add the row to file
+				StringBuffer line = new StringBuffer();
+				for (int j = 0; j < rowDist.size(); j++) {
+					line.append(rowDist.get(j));
+					if (j != rowDist.size() - 1) {
+						line.append(",");
+					}
+				}
+				writer.write(line.toString());
+				writer.newLine();
+			}
+			
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		System.out.println("Finished creating distance matrix; now performing clustering...");
+	}
+	
+	public void createDistanceMatrixEuclidean() {
+		// Create a file to hold the contents of the distance matrix
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("../output/DistanceMatrixEuclidean.txt"), "utf-8"));
+			
+			// Get an ordered array of the document numbers
+			ArrayList<Integer> docNums = new ArrayList<Integer>();
+			Set<Integer> docNumbers = data.keySet();
+			for (Integer i : docNumbers) {
+				docNums.add(i);
+			}
+			
+			// Populate the matrix file
+			System.out.println("Creating the Euclidean distance matrix...");
+			for (int i = 0; i < 100; i++) {
+				System.out.println("Computing " + i + " out of " + docNums.size());
+				// Compute distances
+				ArrayList<Float> rowDist = new ArrayList<Float>();
+				for (int j = 0; j < 100; j++) {
+					float dist = measureEuclidean(data.get(docNums.get(i)),data.get(docNums.get(j)));
+					rowDist.add(dist);
+				}
+				// Add the row to file
+				StringBuffer line = new StringBuffer();
+				for (int j = 0; j < rowDist.size(); j++) {
+					line.append(rowDist.get(j));
+					if (j != rowDist.size() - 1) {
+						line.append(",");
+					}
+				}
+				writer.write(line.toString());
+				writer.newLine();
+			}
+			
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void performClustering() {
+		System.out.println("Performing clustering...");
 		
 		// Perform hierarchical clustering
 		while (distanceMatrix.size() != numOfClusters) {
@@ -60,10 +133,6 @@ public class HierarchicalClustering {
 			
 			System.out.println(docOne);
 			System.out.println(docTwo);
-			
-			if (docOne == docTwo) {
-				System.out.println("Problem");
-			}
 			
 			// Merge the two smallest distances
 			// By row
@@ -130,14 +199,84 @@ public class HierarchicalClustering {
 		return distance;
 	}
 	
-	private float measureEuclideanFloat(ArrayList<Float> one, ArrayList<Float> two) {
-		float distance = 0;
+	public void readMatrixManhattan() {
+		// Clear the distance matrix
+		distanceMatrix = new ArrayList<ArrayList<Float>>();
 		
-		for (int i = 0; i < one.size(); i++) {
-			distance += Math.pow(one.get(i) - two.get(i), 2);
+		// Open file for reading
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("../output/DistanceMatrixManhattan.txt"));
+			// Parse each line
+			String line = "";
+			while ((line = br.readLine()) != null) {				
+				// Separate line by commas
+				String[] stringData = line.split(",");
+				
+				// Convert the string data into floats
+				ArrayList<Float> floatData = new ArrayList<Float>();
+				Integer docNum = 0;
+				for (int i = 0; i < stringData.length; i++) {
+					floatData.add(Float.parseFloat(stringData[i]));
+				}
+				
+				// Add to distance matrix array
+				distanceMatrix.add(floatData);
+			}
+			
+			// Close file
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		return distance;
+		// Output dimensions of the distance matrix
+		System.out.println("Dimensions of distance matrix = " + distanceMatrix.get(0).size() + " x " + distanceMatrix.size());
+	}
+	
+	public void readMatrixEuclidean() {
+		// Clear the distance matrix
+		distanceMatrix = new ArrayList<ArrayList<Float>>();
+		
+		// Open file for reading
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("../output/DistanceMatrixEuclidean.txt"));
+			// Parse each line
+			String line = "";
+			while ((line = br.readLine()) != null) {				
+				// Separate line by commas
+				String[] stringData = line.split(",");
+				
+				// Convert the string data into floats
+				ArrayList<Float> floatData = new ArrayList<Float>();
+				Integer docNum = 0;
+				for (int i = 0; i < stringData.length; i++) {
+					floatData.add(Float.parseFloat(stringData[i]));
+				}
+				
+				// Add to distance matrix array
+				distanceMatrix.add(floatData);
+			}
+			
+			// Close file
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Output dimensions of the distance matrix
+		System.out.println("Dimensions of distance matrix = " + distanceMatrix.get(0).size() + " x " + distanceMatrix.size());
 	}
 	
 	public float getError() {

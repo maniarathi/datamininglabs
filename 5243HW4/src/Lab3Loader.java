@@ -52,7 +52,10 @@ public class Lab3Loader {
 			
 			// Perform Hierarchical clustering on the data collected
 			HierarchicalClustering cluster = new HierarchicalClustering(data,4);
-			cluster.performClustering();
+			cluster.createDistanceMatrixManhattan();
+			//cluster.createDistanceMatrixEuclidean();
+			//cluster.readMatrixEuclidean();
+			//cluster.performClustering();
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: Cannot find file WordCount.csv!");
