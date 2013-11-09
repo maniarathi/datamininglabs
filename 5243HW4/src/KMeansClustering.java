@@ -16,7 +16,7 @@ public class KMeansClustering {
 		convergenceThreshold = t;
 	}
 	
-	public void performClustering() {
+	public void performClustering(boolean isEuc) {
 		// Initialize the centroids to random spots
 		HashMap<Integer,ArrayList<Float>> centroidLocations = new HashMap<Integer,ArrayList<Float>>();
 		for (int i = 0; i < numCentroids; i++) {
@@ -52,7 +52,15 @@ public class KMeansClustering {
 				float smallestDistance = Float.MAX_VALUE;
 				Integer smallestCentroid = 0;
 				for (int j = 0; j < numCentroids; j++) {
-					float currentDistance = measureManhattan(data.get(i),centroidLocations.get(j));
+					float currentDistance;
+					if (isEuc) 
+					{
+						currentDistance= measureEuclidean(data.get(i),centroidLocations.get(j));
+					}
+					else
+					{ 
+						currentDistance= measureManhattan(data.get(i),centroidLocations.get(j));
+					}
 					if (currentDistance <= smallestDistance) {
 						smallestDistance = currentDistance;
 						smallestCentroid = j;
@@ -99,7 +107,15 @@ public class KMeansClustering {
 				}
 				
 				// Check if centroid needs to be updated
-				float difference = measureManhattanFloat(newCentroidLocation,centroidLocations.get(i));
+				float difference;
+				if (isEuc)
+				{
+					difference = measureEuclideanFloat(newCentroidLocation,centroidLocations.get(i));
+				}
+				else
+				{
+					difference = measureManhattanFloat(newCentroidLocation,centroidLocations.get(i));
+				}
 				System.out.println("Difference for centroid " + i + " = " + difference);
 				if (difference > convergenceThreshold) {
 					// Update centroid

@@ -1,24 +1,20 @@
-////////////////////////////////////////////////////////////
-/////////               Roee Ebenstein            //////////
-////////////////////////////////////////////////////////////
-/////////                 10.31.2013              //////////
-////////////////////////////////////////////////////////////
-// HW3
-
-The main file will execute Questions 1, 2 and 3.
+The main file will execute one clustering algorithm, with one distance measurement
 
 For making it a bit easier on you - on this directory there a script named "run"
 you can execute it (from this directory by):
-	./run [numOfGaussian, default is 3]
+	./run algorithm distance [K]
+
+algorithm can be kmeans or hir
+distance can be euc or man
+K is relevant only for kmeans
 	
 This is for the file you gave us, if you want to have a better control over it-execute the java code directly:
 
 For running the application execute:
-	java -classpath bin Hw3EmKmeans data/1dgauss_au12.txt
+	java -classpath bin Lab3Loader kmeans euc 4
+	java -classpath bin Lab3Loader kmeans man 8
+	java -classpath bin Lab3Loader hir euc
+	java -classpath bin Lab3Loader hir man
 
-If you want to change the number of means (for Q1, and Q3) run the following command (8 demonstrates number of means)
-	java -classpath bin Hw3EmKmeans data/1dgauss_au12.txt 8
-
-
-All the answers are implemented within Hw3EmKmeans.java files,
-while the additional classes help to manage it (as handed in HW2)
+	
+The hierarchy algorithm will run for K=4,8,16,32,64, and 128 since it's practically free after training.

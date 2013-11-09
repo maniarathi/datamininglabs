@@ -1,1 +1,1 @@
-java -classpath bin Hw3EmKmeans data/1dgauss_au12.txt $1
+java -classpath bin Lab3Loader $1 $2 $3

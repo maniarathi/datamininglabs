@@ -13,12 +13,18 @@ import java.util.Set;
 
 public class HierarchicalClustering {
 	private HashMap<Integer, ArrayList<Integer>> data;
+	private HashMap<Integer, Set<String>> classifications;
+	private int numOfTotalClass;
+
 	private int numOfClusters;
 	private ArrayList<ArrayList<Float>> distanceMatrix;
+	ArrayList<Integer> docNums;
 	
-	public HierarchicalClustering(HashMap<Integer, ArrayList<Integer>> d, int n) {
+	public HierarchicalClustering(HashMap<Integer, ArrayList<Integer>> d, int n, HashMap<Integer, Set<String>> topics, int totalClass) {
 		data = d;
 		numOfClusters = n;
+		classifications = topics;
+		numOfTotalClass = totalClass;
 	}
 	
 	public void createDistanceMatrixManhattan() {
@@ -27,7 +33,7 @@ public class HierarchicalClustering {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("../output/DistanceMatrixManhattan.txt"), "utf-8"));
 			
 			// Get an ordered array of the document numbers
-			ArrayList<Integer> docNums = new ArrayList<Integer>();
+			docNums = new ArrayList<Integer>();
 			Set<Integer> docNumbers = data.keySet();
 			for (Integer i : docNumbers) {
 				docNums.add(i);
@@ -71,7 +77,7 @@ public class HierarchicalClustering {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("../output/DistanceMatrixEuclidean.txt"), "utf-8"));
 			
 			// Get an ordered array of the document numbers
-			ArrayList<Integer> docNums = new ArrayList<Integer>();
+			docNums = new ArrayList<Integer>();
 			Set<Integer> docNumbers = data.keySet();
 			for (Integer i : docNumbers) {
 				docNums.add(i);
@@ -79,11 +85,11 @@ public class HierarchicalClustering {
 			
 			// Populate the matrix file
 			System.out.println("Creating the Euclidean distance matrix...");
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < docNums.size(); i++) {
 				System.out.println("Computing " + i + " out of " + docNums.size());
 				// Compute distances
 				ArrayList<Float> rowDist = new ArrayList<Float>();
-				for (int j = 0; j < 100; j++) {
+				for (int j = 0; j < docNums.size(); j++) {
 					float dist = measureEuclidean(data.get(docNums.get(i)),data.get(docNums.get(j)));
 					rowDist.add(dist);
 				}
@@ -112,6 +118,15 @@ public class HierarchicalClustering {
 	public void performClustering() {
 		System.out.println("Performing clustering...");
 		
+		// Get papers
+		ArrayList<ArrayList<Integer>> papers = new ArrayList<ArrayList<Integer>>();
+		for (int i=0; i<data.size(); ++i)
+		{
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			tmp.add(docNums.get(i));
+			papers.add(tmp);
+		}
+		
 		// Perform hierarchical clustering
 		while (distanceMatrix.size() != numOfClusters) {
 			System.out.println("Dimensions of distance matrix: " + distanceMatrix.get(0).size() + " x " + distanceMatrix.size());
@@ -134,6 +149,10 @@ public class HierarchicalClustering {
 			System.out.println(docOne);
 			System.out.println(docTwo);
 			
+			ArrayList<Integer> lst1 = papers.get(docOne);
+			ArrayList<Integer> lst2 = papers.get(docTwo);
+			lst1.addAll(lst2);
+			
 			// Merge the two smallest distances
 			// By row
 			ArrayList<Float> mergedDists = new ArrayList<Float>();
@@ -147,12 +166,17 @@ public class HierarchicalClustering {
 			// Remove the higher doc number first
 			if (docOne > docTwo) {
 				distanceMatrix.remove(docOne);
+				papers.remove(docOne);
 				distanceMatrix.remove(docTwo);
+				papers.remove(docTwo);
 			} else {
 				distanceMatrix.remove(docTwo);
+				papers.remove(docTwo);
 				distanceMatrix.remove(docOne);
+				papers.remove(docOne);
 			}
 			distanceMatrix.add(mergedDists);
+			papers.add(lst2);
 			
 			// Now by column
 			for (int i = 0; i < distanceMatrix.size(); i++) {
@@ -174,6 +198,52 @@ public class HierarchicalClustering {
 				replacementRow.add(smaller);
 				// Add the replacement row to the matrix
 				distanceMatrix.add(replacementRow);
+			}
+			
+			if (papers.size() == 4 || papers.size() == 8 ||
+					papers.size() == 16 || papers.size() == 32 ||
+						papers.size() ==  64 || papers.size() == 128)
+			{
+				System.out.println("For class of " + papers.size());
+				double totalEntropy = 0;
+				for (int i=0; i< papers.size(); ++i)
+				{
+					HashMap<String,Integer> counters = new HashMap<String, Integer>();
+					Integer numOfTotal = 0;
+					
+					ArrayList<Integer> in_pap = papers.get(i);
+					for (Integer docId : in_pap)
+					{
+						Set<String> topics = classifications.get(docId);
+						
+						for (String topic:topics)
+						{
+							if (counters.containsKey(topic))
+							{
+								Integer num = counters.get(topic) +1;
+								counters.remove(topic);
+								counters.put(topic, num);
+							}
+							else
+							{
+								counters.put(topic, 1);
+							}
+							++numOfTotal;
+						}
+					}
+					
+					// Calculate entropy
+					double entropy = 0;
+					for (String key:counters.keySet())
+					{
+						Integer num = counters.get(key);
+						entropy = entropy - (((double)num)/(double)numOfTotal)*Math.log(((double)num)/numOfTotal);
+					}
+					
+					totalEntropy = (double)numOfTotal/(double)numOfTotalClass *entropy;
+					
+				}
+				System.out.println("The entropy is " + totalEntropy);
 			}
 			
 		}
