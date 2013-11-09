@@ -1,1 +1,1 @@
-java -classpath bin Lab3Loader $1 $2 $3
+java -Xms512M -Xmx13096M -classpath bin Lab3Loader $1 $2 $3
