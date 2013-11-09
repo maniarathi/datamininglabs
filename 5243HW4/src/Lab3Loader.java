@@ -24,7 +24,7 @@ public class Lab3Loader {
 			HashMap<Integer,ArrayList<Integer>> data = new HashMap<Integer,ArrayList<Integer>>();
 			HashMap<Integer, Set<String>> classifications = new HashMap<Integer, Set<String>>();
 			int TotalClass = 0;
-			int MaxClusterSize = 1000;
+			int MaxClusterSize = Integer.MAX_VALUE;
 			
 			// Open file for reading
 			BufferedReader br = new BufferedReader(new FileReader("../output/WordCount.csv"));
