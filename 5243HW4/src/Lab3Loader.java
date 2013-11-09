@@ -24,6 +24,7 @@ public class Lab3Loader {
 			HashMap<Integer,ArrayList<Integer>> data = new HashMap<Integer,ArrayList<Integer>>();
 			HashMap<Integer, Set<String>> classifications = new HashMap<Integer, Set<String>>();
 			int TotalClass = 0;
+			int MaxClusterSize = 1000;
 			
 			// Open file for reading
 			BufferedReader br = new BufferedReader(new FileReader("../output/WordCount.csv"));
@@ -31,7 +32,8 @@ public class Lab3Loader {
 			
 			// Parse each line
 			String line = "";
-			while ((line = br.readLine()) != null) {
+			int CurrSize = 0;
+			while ((line = br.readLine()) != null && CurrSize++ < MaxClusterSize) {
 				// Separate line by commas
 				String[] stringData = line.split(",");
 				
@@ -61,17 +63,20 @@ public class Lab3Loader {
 				
 				int docId = Integer.parseInt(stringData[0]);
 				
-				if (classifications.containsKey(docId))
+				if (data.containsKey(docId))
 				{
-					classifications.get(docId).add(stringData[stringData.length-1]);
+					if (classifications.containsKey(docId))
+					{
+						classifications.get(docId).add(stringData[stringData.length-1]);
+					}
+					else
+					{
+						Set<String> tmp = new HashSet<String>();
+						tmp.add(stringData[stringData.length-1]);
+						classifications.put(docId, tmp);
+					}
+					++TotalClass;
 				}
-				else
-				{
-					Set<String> tmp = new HashSet<String>();
-					tmp.add(stringData[stringData.length-1]);
-					classifications.put(docId, tmp);
-				}
-				++TotalClass;
 			}
 			
 			// Close file

@@ -129,10 +129,13 @@ public class HierarchicalClustering {
 		
 		// Perform hierarchical clustering
 		while (distanceMatrix.size() != numOfClusters) {
-			System.out.println("Dimensions of distance matrix: " + distanceMatrix.get(0).size() + " x " + distanceMatrix.size());
+			//System.out.println("Dimensions of distance matrix: " + distanceMatrix.get(0).size() + " x " + distanceMatrix.size());
 			// Find the smallest distance and document indices
 			int docOne = 0;
 			int docTwo = 0;
+			
+			if (distanceMatrix.size() %500 == 0)
+				System.out.println("Distance matrix size = " + distanceMatrix.size());
 			
 			float smallestDistance = Float.MAX_VALUE;
 			for (int i = 0; i < distanceMatrix.size()-1; i++) {
@@ -146,8 +149,8 @@ public class HierarchicalClustering {
 				}
 			}
 			
-			System.out.println(docOne);
-			System.out.println(docTwo);
+			//System.out.println(docOne);
+			//System.out.println(docTwo);
 			
 			ArrayList<Integer> lst1 = papers.get(docOne);
 			ArrayList<Integer> lst2 = papers.get(docTwo);
@@ -176,7 +179,7 @@ public class HierarchicalClustering {
 				papers.remove(docOne);
 			}
 			distanceMatrix.add(mergedDists);
-			papers.add(lst2);
+			papers.add(lst1);
 			
 			// Now by column
 			for (int i = 0; i < distanceMatrix.size(); i++) {
@@ -206,12 +209,19 @@ public class HierarchicalClustering {
 			{
 				System.out.println("For class of " + papers.size());
 				double totalEntropy = 0;
+				double var = 0;
+				double sumPower = 0;
+				double sum =0;
 				for (int i=0; i< papers.size(); ++i)
 				{
 					HashMap<String,Integer> counters = new HashMap<String, Integer>();
 					Integer numOfTotal = 0;
 					
+					
+					
 					ArrayList<Integer> in_pap = papers.get(i);
+					sumPower += Math.pow((double)in_pap.size(),2);
+					sum += in_pap.size();
 					for (Integer docId : in_pap)
 					{
 						Set<String> topics = classifications.get(docId);
@@ -234,16 +244,21 @@ public class HierarchicalClustering {
 					
 					// Calculate entropy
 					double entropy = 0;
+					
 					for (String key:counters.keySet())
 					{
 						Integer num = counters.get(key);
 						entropy = entropy - (((double)num)/(double)numOfTotal)*Math.log(((double)num)/numOfTotal);
+						//System.out.println("There are " + num + " papers in " + key + " cluster.");
 					}
 					
 					totalEntropy = (double)numOfTotal/(double)numOfTotalClass *entropy;
 					
 				}
 				System.out.println("The entropy is " + totalEntropy);
+				// variance
+				var = (sumPower / (double)papers.size()) - Math.pow((sum/(double)papers.size()), 2);
+				System.out.println("The variance is " + Math.sqrt(var));
 			}
 			
 		}
