@@ -1,3 +1,9 @@
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,11 +15,15 @@ public class KMeansClustering {
 	HashMap<Integer, ArrayList<Integer>> data;
 	int numCentroids;
 	float convergenceThreshold;
+	private HashMap<Integer, Set<String>> classifications;
+	private int numOfTotalClass;
 	
-	public KMeansClustering(HashMap<Integer,ArrayList<Integer>> d, int c, float t) {
+	public KMeansClustering(HashMap<Integer,ArrayList<Integer>> d, int c, float t, HashMap<Integer,Set<String>> topics, int totalClass) {
 		data = d;
 		numCentroids = c;
 		convergenceThreshold = t;
+		classifications = topics;
+		numOfTotalClass = totalClass;
 	}
 	
 	public void performClustering(boolean isEuc) {
@@ -131,6 +141,44 @@ public class KMeansClustering {
 			}
 		}
 		System.out.println("Number of iterations: " + iterations);
+		
+		// Map cluster to docs
+		ArrayList<ArrayList<Integer>> papers = new ArrayList<ArrayList<Integer>>();
+		for (int i = 0; i < numCentroids; i++) {
+			ArrayList<Integer> doc = new ArrayList<Integer>();
+			Set<Integer> allDocs = docToCentroid.keySet();
+			for (Integer d : allDocs) {
+				if (docToCentroid.get(d) == i) {
+					doc.add(d);
+				}
+			}
+			papers.add(doc);
+		}
+		
+		// To file map each centroid to the documents it is associated with
+		try {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("../output/KMeansClusters.txt"), "utf-8"));
+			for (Integer i = 0; i < papers.size(); i++) {
+				writer.write(i.toString());
+				for (int j = 0; j < papers.get(i).size(); j++) {
+					writer.write(",");
+					writer.write(papers.get(i).get(j).toString());
+				}
+				writer.write("\n");
+			}
+			writer.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// Get standard deviation and entropy
+		ResultsComputer results = new ResultsComputer("../output/KMeansClusters.txt","../output/WordList-kmeans.csv");
+		System.out.println("Standard deviation = " + results.getStandardDeviation());
+		System.out.println("Entropy = " + results.getEntropy());
 	}
 	
 	public void getResults() {

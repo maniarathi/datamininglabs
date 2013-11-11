@@ -118,6 +118,9 @@ public class ResultsComputer {
 		// Container to hold cluster entropies
 		HashMap<Integer,Float> entropyOfCluster = new HashMap<Integer,Float>();
 		
+		// Total topics value
+		float totalTopics = 0;
+		
 		// Iterate through the clusters
 		Set<Integer> allClusters = clusterToDocs.keySet();
 		System.out.println(allClusters.size());
@@ -129,18 +132,21 @@ public class ResultsComputer {
 				// For each document add the topic occurrence to the map
 				ArrayList<String> topics = docToTopics.get(docNumber);
 				//System.out.println(docToTopics.size());
-				for (int j = 0; j < topics.size(); j++) {
-					
-					if (topicsMap.containsKey(topics.get(j))) {
-						// Topic already exists so just add the value
-						float value = topicsMap.remove(topics.get(j));
-						value += (float) ((1.0)/(topics.size()));
-						topicsMap.put(topics.get(j),value);
-					} else {
-						// Add the new topic
-						float value = (float) ((1.0)/(topics.size()));
-						topicsMap.put(topics.get(j),value);
-					}
+				if (topics != null)
+					for (int j = 0; j < topics.size(); j++) {
+						
+						if (topicsMap.containsKey(topics.get(j))) {
+							// Topic already exists so just add the value
+							float value = topicsMap.remove(topics.get(j));
+							value += (float) ((1.0)/(topics.size()));
+							totalTopics += (float) ((1.0)/(topics.size()));
+							topicsMap.put(topics.get(j),value);
+						} else {
+							// Add the new topic
+							float value = (float) ((1.0)/(topics.size()));
+							totalTopics += (float) ((1.0)/(topics.size()));
+							topicsMap.put(topics.get(j),value);
+						}
 				}
 			}
 			
@@ -150,15 +156,16 @@ public class ResultsComputer {
 			for (String t : mappedTopics) {
 				
 				float value = topicsMap.get(t);
-				value /= docToTopics.size();
-				newTopicsMap.put(t,value);
+				float newValue = value/totalTopics;
+				newTopicsMap.put(t,newValue);
 			}
 			
 			// Compute entropy of each cluster
 			float clusterEntropy = 0;
 			for (String t : mappedTopics) {
-				float prob = topicsMap.get(t);
-				clusterEntropy += prob * (Math.log(prob)/Math.log(2));
+				float prob = newTopicsMap.get(t);
+				float thisEntropy = (float) (prob * (Math.log(prob)/Math.log(2)));
+				clusterEntropy += thisEntropy;
 			}
 			entropyOfCluster.put(i,clusterEntropy);
 		}
@@ -169,6 +176,6 @@ public class ResultsComputer {
 			entropy += weight*(double)entropyOfCluster.get(i);
 		}
 		
-		return entropy;	
+		return entropy * -1;	
 	}
 }

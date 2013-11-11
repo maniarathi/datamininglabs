@@ -248,7 +248,7 @@ public class HierarchicalClustering {
 					for (String key:counters.keySet())
 					{
 						Integer num = counters.get(key);
-						entropy = entropy - (((double)num)/(double)numOfTotal)*Math.log(((double)num)/numOfTotal);
+						entropy = entropy - (((double)num)/(double)numOfTotal)*(Math.log(((double)num)/numOfTotal)/Math.log(2));
 						//System.out.println("There are " + num + " papers in " + key + " cluster.");
 					}
 					

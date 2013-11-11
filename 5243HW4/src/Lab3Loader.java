@@ -72,7 +72,8 @@ public class Lab3Loader {
 					else
 					{
 						Set<String> tmp = new HashSet<String>();
-						tmp.add(stringData[stringData.length-1]);
+						if (stringData[stringData.length-1] != "empty")
+							tmp.add(stringData[stringData.length-1]);
 						classifications.put(docId, tmp);
 					}
 					++TotalClass;
@@ -87,7 +88,7 @@ public class Lab3Loader {
 			if (args[0].equals("kmeans"))
 			{
 				int k = Integer.parseInt(args[2]);
-				KMeansClustering cluster = new KMeansClustering(data,k,0);
+				KMeansClustering cluster = new KMeansClustering(data,k,0,classifications,TotalClass);
 				if (args[1].equals("euc"))
 				{
 					cluster.performClustering(true);
