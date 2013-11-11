@@ -18,3 +18,5 @@ For running the application execute:
 
 	
 The hierarchy algorithm will run for K=4,8,16,32,64, and 128 since it's practically free after training.
+
+Please notice that for running this code the Word*.csv files are required to be at "../output/"
