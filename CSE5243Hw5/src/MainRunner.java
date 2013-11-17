@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -12,9 +10,10 @@ public class MainRunner {
 
 	public static void main(String[] args) {
 		String fileName = "../output/WordList.csv";
-		int NumOfTopics = 123;
-		double Support = 0.05;
-		double Confidence = 0.1;
+		//String fileName = "../output/WordTest.csv";
+		int NumOfTopics = 100;
+		double Support = 0.1;
+		double Confidence = 50;
 		
 		if (args.length > 0)
 		{
@@ -31,6 +30,8 @@ public class MainRunner {
 			
 			// Prepare file
 			FixFile(fileName,fileName+".fix");
+			
+			NumOfTopics = TopicMap.size();
 			
 			String[] params = new String[4];
 			params[0] = "-F"+fileName+".fix"; // this is the training file name
@@ -82,7 +83,7 @@ public class MainRunner {
 	static HashMap<String,Integer> DataMap = new HashMap<String,Integer>();
 	static HashMap<String,Integer> TopicMap = new HashMap<String,Integer>();
 	static Integer MaxId = 0;
-	static Integer TopicsOffset = 10000;
+	static Integer TopicsOffset = 0;
 	
 	
 	static void FixFile(String inputFile, String outputFile) 
@@ -90,6 +91,20 @@ public class MainRunner {
 		try
 		{
 			BufferedReader br = new BufferedReader(new FileReader(inputFile));
+			
+			while (br.ready())
+			{
+				String[] data = br.readLine().split(",");
+				for (int i=1; i<data.length-1; ++i)
+				{
+					AddToMapIfNotThere(DataMap, data[i]);
+				}
+			}
+			br.close();
+			
+			TopicsOffset = DataMap.size();
+			
+			br = new BufferedReader(new FileReader(inputFile));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
 			
 			while (br.ready())
