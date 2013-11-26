@@ -1,0 +1,8 @@
+Authors: Arathi Mani and Roee Ebenstein
+
+Project Description: This Java project uses open source software to perform Classification Based on Associations.  The open source software was downloaded from http://cgi.csc.liv.ac.uk/~frans/KDD/Software/CBA/cba.html.  The clustering algorithm used to perform CBA on 8 and 16 clusters was K-means using Manhattan distance metrics.  For 8 clusters, we used our own implementation of K-means from Lab 2 and for 16 we used a 3rd party GUI so that no cluster had zero elements associated with it.
+
+To Run: MainRunner.java (containing the main function) takes up to 4 arguments: the first argument is the file that should be loaded, the second argument is the number of classes, the third argument is the minimum support, and the fourth argument is the minimum confidence percentage.  None of these arguments are required as the defaults will run without any input. Please note that configuring X11 is required for this code to execute due to the external library. Please set the DISPLAY environment variable, and enable X11 on your desktop.
+
+Sample command: ./run
+Sample command 2: ./run ../output/WordList.csv 1 0.1 90
