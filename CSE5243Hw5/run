@@ -1,0 +1,1 @@
+java -Xms512M -Xmx13096M -Dfile.encoding=MacRoman -classpath bin:ARtool_bin_1_1_2/ARtool.jar MainRunner $1 $2 $3 $4

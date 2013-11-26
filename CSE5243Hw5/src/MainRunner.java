@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -304,4 +305,93 @@ public class MainRunner {
 			System.out.println("ERROR: Could not read file " + clusterFile);
 		}
     }
+    
+    private static void createKTransactionFilesSlow(String clusterFile) {
+        try {
+            // Create readers
+            BufferedReader clusterList = new BufferedReader(new FileReader(
+                    clusterFile));
+            Integer clusterNumber = 0;
+            // Iterate through clusters
+            while (clusterList.ready()) {
+                String clusterLine = clusterList.readLine();
+                // Get a list of all the document numbers
+                String[] docNumsStrings = clusterLine.split(",");
+                Set<String> docs = new HashSet<String>();
+                for (String s : docNumsStrings) {
+                    docs.add(s);
+                }
+                // Create a new file for the cluster
+                String clusterFileName = "../output/2ndKMeansCluster"
+                        + clusterNumber.toString() + ".txt";
+                BufferedWriter bw = new BufferedWriter(new FileWriter(
+                        clusterFileName));
+                // Iterate through the WordList file
+                BufferedReader wordList = new BufferedReader(new FileReader(
+                        "../output/WordList.csv"));
+                while (wordList.ready()) {
+                    String lineOfWordList = wordList.readLine();
+                    // Split by commas
+                    String[] wordListData = lineOfWordList.split(",");
+                    // Check if number is included in the cluster set
+                    if (docs.contains(wordListData[0])) {
+                        // Write the line
+                        bw.write(lineOfWordList);
+                        bw.newLine();
+                    }
+                }
+                // Close open files
+                wordList.close();
+                bw.close();
+            }
+            // Close open files
+            clusterList.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: File not found!");
+        } catch (IOException e) {
+            System.out.println("ERROR: Could not read file!");
+        }
+    }
+
+    private static void fromOpenSourceToNormal(String file) {
+        System.out.println("Hi Im here");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            System.out.println("Opened file for reading: " + file);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(
+                    "../output/GenerateClusters.txt"));
+
+            // Read each line
+            String line = "";
+            Integer clusterNum = -1;
+            StringBuffer lineToWrite = new StringBuffer();
+            while (br.ready()) {
+                line = br.readLine();
+                String[] data = line.split("\t");
+                Integer num = Integer.parseInt(data[1]);
+                if (clusterNum != num) {
+                    if (clusterNum != -1) {
+                        String toWrite = lineToWrite.toString();
+                        bw.write(toWrite);
+                        bw.newLine();
+                    }
+                    clusterNum = num;
+                    lineToWrite = new StringBuffer();
+                    lineToWrite.append(data[1]);
+                    lineToWrite.append(",");
+                    lineToWrite.append(data[0]);
+                } else {
+                    lineToWrite.append(",");
+                    lineToWrite.append(data[0]);
+                }
+            }
+            String toWrite = lineToWrite.toString();
+            bw.write(toWrite);
+            br.close();
+            bw.close();
+        } catch (IOException e) {
+            System.out.println("Could not open file");
+        }
+    }
+
 }
